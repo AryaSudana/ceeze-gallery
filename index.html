@@ -318,6 +318,10 @@
 
   <div id="toast" class="toast">Notifikasi</div>
 
+  <!-- Firebase SDK (Zero-Build CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <!-- Dependencies -->
   <script src="js/demo-data.js"></script>
   <script src="js/auth.js"></script>
@@ -399,9 +403,9 @@
       }
 
       // Key Submission
-      document.getElementById('btn-submit-home-key')?.addEventListener('click', () => {
+      document.getElementById('btn-submit-home-key')?.addEventListener('click', async () => {
         const val = document.getElementById('input-home-key')?.value;
-        const res = AuthService.validateKey(val);
+        const res = await AuthService.validateKey(val);
         const errEl = document.getElementById('home-key-error');
 
         if (!res.valid) {

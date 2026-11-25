@@ -149,9 +149,9 @@
         <div class="stat-num" id="stat-total-galleries" style="color: #10b981;">0</div>
       </div>
       <div class="stat-card">
-        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">Status Server & Domain</div>
-        <div class="stat-num" style="font-size: 20px; font-weight: 700; color: #10b981; padding-top: 8px;">
-          Aktif (Vercel)
+        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">Status Cloud Sync</div>
+        <div class="stat-num" id="stat-cloud-text" style="font-size: 18px; font-weight: 700; color: #eab308; padding-top: 8px;">
+          Lokal (Offline)
         </div>
       </div>
     </div>
@@ -202,21 +202,55 @@
       </div>
     </div>
 
-    <!-- SETTINGS: CHANGE PIN -->
-    <div class="admin-card" style="max-width: 500px;">
-      <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">🔒 Ubah Master Admin PIN</h3>
-      <div class="form-group">
-        <label class="form-label" for="input-new-pin">PIN Baru (Minimal 4 karakter)</label>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="input-new-pin" class="input-text" placeholder="PIN baru..." />
-          <button id="btn-update-pin" class="btn btn-secondary btn-sm">Simpan</button>
+    <!-- SETTINGS GRID -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px;">
+      
+      <!-- SETTINGS: CHANGE PIN -->
+      <div class="admin-card">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">🔒 Ubah Master Admin PIN</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Ganti PIN akses portal admin untuk menjaga keamanan manajemen studio.
+        </p>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="input-new-pin">PIN Baru (Minimal 4 karakter)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="input-new-pin" class="input-text" placeholder="PIN baru..." />
+            <button id="btn-update-pin" class="btn btn-secondary btn-sm">Simpan</button>
+          </div>
         </div>
       </div>
+
+      <!-- SETTINGS: FIREBASE CLOUD SYNC -->
+      <div class="admin-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 0;">☁️ Sinkronisasi Cloud (Firebase)</h3>
+          <span id="badge-cloud-status" style="font-size: 11.5px; padding: 4px 10px; border-radius: 999px; font-weight: 700; background: rgba(234, 179, 8, 0.15); color: #eab308;">
+            🟡 Mode Lokal
+          </span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+          Hubungkan ke Firebase agar License Key, kuota, dan masa aktif galeri tersinkronisasi <b>realtime di semua perangkat (HP, PC, dan klien)</b>.
+        </p>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" for="input-firebase-config">Firebase Config (JSON)</label>
+          <textarea id="input-firebase-config" class="input-text" rows="3" style="font-family: monospace; font-size: 11.5px; resize: vertical;" placeholder='{\n  "apiKey": "AIzaSy...",\n  "projectId": "ceeze-studio-xxx",\n  ...\n}'></textarea>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-save-firebase" class="btn btn-primary btn-sm">Simpan & Hubungkan</button>
+          <button id="btn-test-firebase" class="btn btn-secondary btn-sm">Tes Koneksi</button>
+          <button id="btn-reset-firebase" class="btn btn-ghost btn-sm" style="color: #ef4444;">Putuskan Cloud</button>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
   <div id="toast" class="toast">Notifikasi</div>
+
+  <!-- Firebase SDK (Zero-Build CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <!-- Dependencies -->
   <script src="js/auth.js"></script>
@@ -232,68 +266,187 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const sessionLoggedIn = sessionStorage.getItem('ceeze_admin_auth');
-      if (sessionLoggedIn === 'true') {
-        unlockAdminView();
-      }
-
-      // PIN Submit
-      document.getElementById('btn-submit-pin')?.addEventListener('click', () => {
-        const pin = document.getElementById('input-master-pin')?.value;
+      // 1. PIN Submit Button & Enter Key
+      const submitPin = () => {
+        const pinInput = document.getElementById('input-master-pin');
+        const pin = pinInput?.value;
         if (AuthService.verifyAdminPin(pin)) {
           sessionStorage.setItem('ceeze_admin_auth', 'true');
+          document.getElementById('pin-error-msg').style.display = 'none';
           unlockAdminView();
         } else {
-          document.getElementById('pin-error-msg').style.display = 'block';
+          const errEl = document.getElementById('pin-error-msg');
+          if (errEl) errEl.style.display = 'block';
+          if (pinInput) pinInput.focus();
+        }
+      };
+
+      document.getElementById('btn-submit-pin')?.addEventListener('click', submitPin);
+
+      document.getElementById('input-master-pin')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitPin();
         }
       });
 
-      // Logout
+      // 2. Logout Button
       document.getElementById('btn-admin-logout')?.addEventListener('click', () => {
         sessionStorage.removeItem('ceeze_admin_auth');
-        window.location.reload();
+        sessionStorage.clear();
+        showToast("🔒 Berhasil Logout dari Admin");
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
       });
 
-      // Create Key Form
-      document.getElementById('form-create-key')?.addEventListener('submit', (e) => {
+      // 3. Create Key Form
+      document.getElementById('form-create-key')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('input-client-name')?.value;
         const quota = document.getElementById('input-max-quota')?.value;
 
         if (!name) return;
-        const newKey = AuthService.createLicenseKey(name, quota);
+        const newKey = await AuthService.createLicenseKey(name, quota);
         showToast(`✅ Berhasil membuat key untuk ${name}: ${newKey.key}`);
 
         // Reset form
         document.getElementById('input-client-name').value = '';
         document.getElementById('input-max-quota').value = '2';
-        refreshAdminData();
+        await refreshAdminData();
       });
 
-      // Update PIN
-      document.getElementById('btn-update-pin')?.addEventListener('click', () => {
+      // 4. Update PIN
+      document.getElementById('btn-update-pin')?.addEventListener('click', async () => {
         const newPin = document.getElementById('input-new-pin')?.value;
-        if (AuthService.setAdminPin(newPin)) {
+        if (await AuthService.setAdminPin(newPin)) {
           showToast("✅ Master PIN berhasil diubah!");
-          document.getElementById('display-current-pin').textContent = newPin;
+          const pinDisplay = document.getElementById('display-current-pin');
+          if (pinDisplay) pinDisplay.textContent = newPin;
           document.getElementById('input-new-pin').value = '';
         } else {
           showToast("⚠️ PIN minimal 4 karakter");
         }
       });
+
+      // 5. Firebase Cloud Settings Handlers
+      document.getElementById('btn-save-firebase')?.addEventListener('click', async () => {
+        const raw = document.getElementById('input-firebase-config')?.value?.trim();
+        if (!raw) {
+          showToast("⚠️ Masukkan config Firebase terlebih dahulu");
+          return;
+        }
+
+        try {
+          // Parse JSON or extract object
+          let configObj = null;
+          if (raw.startsWith('{') && raw.endsWith('}')) {
+            configObj = JSON.parse(raw);
+          } else {
+            // If user pasted "const firebaseConfig = { ... };"
+            const match = raw.match(/\{[\s\S]*\}/);
+            if (match) configObj = JSON.parse(match[0]);
+          }
+
+          if (!configObj || !configObj.projectId) {
+            throw new Error("Format config tidak valid, pastikan berisi projectId & apiKey");
+          }
+
+          const success = AuthService.saveFirebaseConfig(configObj);
+          if (success) {
+            showToast("🎉 Berhasil terhubung ke Cloud Firestore!");
+            updateCloudUI();
+            await refreshAdminData();
+          } else {
+            showToast("⚠️ Gagal inisialisasi Firebase");
+          }
+        } catch (err) {
+          showToast("⚠️ Error parsing config: " + err.message);
+        }
+      });
+
+      document.getElementById('btn-test-firebase')?.addEventListener('click', async () => {
+        showToast("⏳ Menguji koneksi Cloud Firestore...", 2000);
+        const res = await AuthService.testConnection();
+        if (res.success) {
+          showToast("🎉 " + res.message, 4000);
+          updateCloudUI();
+          await refreshAdminData();
+        } else {
+          alert("⚠️ Hasil Tes Koneksi Firebase:\n\n" + res.message);
+          showToast("⚠️ " + res.message.split('\n')[0], 6000);
+        }
+      });
+
+      document.getElementById('btn-reset-firebase')?.addEventListener('click', () => {
+        if (confirm("Putuskan koneksi Cloud Firebase dan kembali ke penyimpanan lokal?")) {
+          AuthService.saveFirebaseConfig(null);
+          document.getElementById('input-firebase-config').value = '';
+          updateCloudUI();
+          showToast("Koneksi cloud diputuskan, beralih ke penyimpanan lokal.");
+          refreshAdminData();
+        }
+      });
+
+      // 6. Check Active Session
+      try {
+        const sessionLoggedIn = sessionStorage.getItem('ceeze_admin_auth');
+        if (sessionLoggedIn === 'true') {
+          unlockAdminView();
+        } else {
+          document.getElementById('input-master-pin')?.focus();
+        }
+      } catch (err) {
+        console.error("Session check error:", err);
+      }
     });
 
-    function unlockAdminView() {
-      document.getElementById('modal-pin-gate').classList.remove('active');
-      document.getElementById('admin-main-view').style.display = 'block';
-      document.getElementById('btn-admin-logout').style.display = 'inline-flex';
-      document.getElementById('display-current-pin').textContent = AuthService.getAdminPin();
-      refreshAdminData();
+    function updateCloudUI() {
+      const badge = document.getElementById('badge-cloud-status');
+      const stat = document.getElementById('stat-cloud-text');
+      const cfgInput = document.getElementById('input-firebase-config');
+      const isOnline = AuthService.isFirebaseActive;
+
+      if (badge) {
+        badge.innerHTML = isOnline ? '🟢 Cloud Aktif (Realtime)' : '🟡 Mode Lokal';
+        badge.style.background = isOnline ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)';
+        badge.style.color = isOnline ? '#10b981' : '#eab308';
+      }
+      if (stat) {
+        stat.textContent = isOnline ? '🟢 Cloud Aktif' : '🟡 Lokal (Browser)';
+        stat.style.color = isOnline ? '#10b981' : '#eab308';
+      }
+
+      const existingCfg = AuthService.getFirebaseConfig();
+      if (existingCfg && cfgInput && !cfgInput.value) {
+        cfgInput.value = JSON.stringify(existingCfg, null, 2);
+      }
     }
 
-    function refreshAdminData() {
-      const keys = AuthService.getAllKeys();
-      const meta = AuthService.getAllGalleriesMeta();
+    function unlockAdminView() {
+      try {
+        const modal = document.getElementById('modal-pin-gate');
+        if (modal) modal.classList.remove('active');
+        
+        const mainView = document.getElementById('admin-main-view');
+        if (mainView) mainView.style.display = 'block';
+
+        const logoutBtn = document.getElementById('btn-admin-logout');
+        if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+
+        const pinDisplay = document.getElementById('display-current-pin');
+        if (pinDisplay) pinDisplay.textContent = AuthService.getAdminPin();
+
+        updateCloudUI();
+        refreshAdminData();
+      } catch (err) {
+        console.error("Unlock admin view error:", err);
+      }
+    }
+
+    async function refreshAdminData() {
+      const keys = await AuthService.getAllKeysAsync();
+      const meta = await AuthService.getAllGalleriesMetaAsync();
 
       // Stats
       document.getElementById('stat-total-keys').textContent = keys.length;
@@ -348,11 +501,11 @@
       showToast("📋 Link Editor langsung sudah disalin! Kirimkan link ini ke klien kamu.");
     }
 
-    function deleteKey(key) {
+    async function deleteKey(key) {
       if (confirm(`Yakin ingin menghapus key ${key}? Pengguna tidak akan bisa membuat galeri baru.`)) {
-        AuthService.deleteLicenseKey(key);
+        await AuthService.deleteLicenseKey(key);
         showToast("Key berhasil dihapus.");
-        refreshAdminData();
+        await refreshAdminData();
       }
     }
   </script>

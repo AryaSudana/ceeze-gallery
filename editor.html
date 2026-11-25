@@ -369,6 +369,10 @@
 
   <div id="toast" class="toast">Notifikasi</div>
 
+  <!-- Firebase SDK (Zero-Build CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <!-- Dependencies -->
   <script src="js/demo-data.js"></script>
   <script src="js/auth.js"></script>
@@ -489,9 +493,9 @@
       });
 
       // Submit Key button
-      document.getElementById('btn-submit-key')?.addEventListener('click', () => {
+      document.getElementById('btn-submit-key')?.addEventListener('click', async () => {
         const val = document.getElementById('input-auth-key')?.value;
-        validateAndLoginKey(val);
+        await validateAndLoginKey(val);
       });
 
       // Folder Submit
@@ -517,7 +521,7 @@
       });
 
       // Publish Button
-      document.getElementById('btn-publish-gallery')?.addEventListener('click', () => {
+      document.getElementById('btn-publish-gallery')?.addEventListener('click', async () => {
         if (!currentKey) {
           openModal('auth-gate-modal');
           return;
@@ -527,7 +531,7 @@
 
         try {
           // Register with Auth Engine & save theme/layout config
-          const meta = AuthService.registerGallery(currentKey, currentFolderId, editor.config, expiryDays);
+          const meta = await AuthService.registerGallery(currentKey, currentFolderId, editor.config, expiryDays);
           updatePreviewClientLink();
           
           // Generate Clean Short Client URL (pure domain + folder id)
@@ -580,8 +584,8 @@
       btn.href = `gallery.html?f=${currentFolderId}`;
     }
 
-    function validateAndLoginKey(key) {
-      const res = AuthService.validateKey(key);
+    async function validateAndLoginKey(key) {
+      const res = await AuthService.validateKey(key);
       const errEl = document.getElementById('auth-error-msg');
 
       if (!res.valid) {
