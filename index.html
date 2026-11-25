@@ -3,500 +3,417 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CeEZe Gallery - Google Drive Client Photo Gallery & Editor</title>
-  <meta name="description" content="CeEZe Gallery - Konvert folder Google Drive menjadi website galeri foto klien yang interaktif, mewah, dan cepat.">
-  
-  <!-- Favicon -->
+  <title>CeEZe Studio - Luxury Google Drive Photo Gallery Platform</title>
+  <meta name="description" content="CeEZe Studio - Platform galeri foto klien modern berbasis Google Drive untuk fotografer profesional.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
 
-  <!-- Google Fonts: Modern & Luxury Typography -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Core & Responsive Styles -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    /* Homepage Specific Design */
+    .landing-hero {
+      padding: 100px 24px 60px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #60a5fa;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .landing-headline {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: clamp(34px, 5.5vw, 56px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .landing-subtitle {
+      font-size: clamp(16px, 2vw, 19px);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 680px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Interactive Mini-Demo Section */
+    .demo-section {
+      max-width: 1200px;
+      margin: 40px auto 100px;
+      padding: 0 24px;
+    }
+
+    .demo-showcase-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .demo-toolbar {
+      padding: 18px 24px;
+      background: var(--glass-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .demo-canvas {
+      padding: 40px 32px;
+      transition: all 0.3s ease;
+      min-height: 480px;
+    }
+
+    /* Features Grid */
+    .features-section {
+      max-width: 1200px;
+      margin: 0 auto 100px;
+      padding: 0 24px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px 24px;
+      transition: transform 0.2s ease, border-color 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-active);
+    }
+
+    .feature-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ========================================================================
-       TOP HEADER NAVIGATION
-       ======================================================================== -->
+  <!-- TOP HEADER -->
   <header class="top-header">
     <div style="display: flex; align-items: center; gap: 14px;">
-      <button id="btn-toggle-sidebar" class="btn btn-secondary btn-sm" title="Buka/Tutup Menu Editor">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-
-      <a href="#" class="brand">
-        <div class="brand-icon" style="font-size: 13px; font-weight: 800; letter-spacing: -0.5px;">CZ</div>
-        <span class="brand-title">CeEZe Gallery</span>
+      <a href="index.html" class="brand">
+        <div class="brand-icon" style="font-size: 13px; font-weight: 800;">CZ</div>
+        <span class="brand-title">CeEZe Studio</span>
       </a>
     </div>
 
     <div class="header-actions">
-      <!-- Google Drive API Key Config Button -->
-      <button id="btn-open-api-modal" class="btn btn-ghost btn-sm" title="Pengaturan Google Drive API">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-        </svg>
-        <span class="hide-mobile">Drive API</span>
-      </button>
-
-      <!-- Client Favorites Header Badge -->
-      <button id="btn-top-favorites" class="btn btn-secondary btn-sm" title="Lihat Foto Pilihan">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span id="fav-count-badge">0</span>
-      </button>
-
-      <!-- Share Link Button -->
-      <button id="btn-open-share-modal" class="btn btn-primary btn-sm">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="18" cy="5" r="3"></circle>
-          <circle cx="6" cy="12" r="3"></circle>
-          <circle cx="18" cy="19" r="3"></circle>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-        </svg>
-        <span>Bagikan</span>
-      </button>
-
-      <!-- Toggle Client View vs Editor Mode -->
-      <button id="btn-toggle-view" class="btn btn-secondary btn-sm">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <span class="hide-mobile">Preview Klien</span>
+      <a href="admin.html" class="btn btn-ghost btn-sm" title="Panel Khusus Pemilik Studio">
+        👑 Admin Portal
+      </a>
+      <button class="btn btn-primary btn-sm" onclick="openKeyModal();">
+        + Buat Galeri
       </button>
     </div>
   </header>
 
-  <!-- ========================================================================
-       MAIN APP CONTAINER (Sidebar Editor + Live Preview)
-       ======================================================================== -->
-  <div class="app-container">
+  <!-- HERO SECTION -->
+  <section class="landing-hero">
+    <h1 class="landing-headline">
+      Ubah Google Drive Jadi Galeri Klien <span style="background: linear-gradient(135deg, #60a5fa, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Mewah & Siap Pakai</span>
+    </h1>
 
-    <!-- SIDEBAR CUSTOMIZER -->
-    <aside id="editor-sidebar" class="editor-sidebar">
-      
-      <!-- 1. Google Drive Folder Source -->
-      <div class="sidebar-section">
-        <h4 class="sidebar-title">Sumber Folder Google Drive</h4>
-        <form id="form-load-folder" class="form-group">
-          <label class="form-label" for="input-folder-link">Link / Folder ID</label>
-          <input 
-            type="text" 
-            id="input-folder-link" 
-            class="input-text" 
-            placeholder="Tempel link Google Drive di sini..." 
-            autocomplete="off"
-          />
-          <p class="form-hint">Pastikan akses folder: <i>"Anyone with the link"</i> (Viewer).</p>
-          <div style="display: flex; gap: 8px; margin-top: 10px;">
-            <button type="submit" class="btn btn-primary btn-sm" style="flex: 1;">Muat Folder</button>
-            <button type="button" id="btn-load-demo" class="btn btn-secondary btn-sm" title="Kembali ke galeri demo">Demo</button>
-          </div>
-        </form>
-      </div>
+    <p class="landing-subtitle">
+      Kirim hasil foto klien dengan tampilan eksklusif layaknya portfolio berkelas dunia. Terintegrasi pemilihan foto favorit via WhatsApp, hemat hosting, dan dilengkapi proteksi masa aktif galeri.
+    </p>
 
-      <!-- 2. Theme & Color Presets -->
-      <div class="sidebar-section">
-        <h4 class="sidebar-title">Tema & Warna</h4>
-        
-        <div class="form-group">
-          <label class="form-label">Preset Desain</label>
-          <div class="preset-grid">
-            <button type="button" class="preset-pill active" data-preset="dark">
-              <span class="color-dot" style="background: #0d0f12;"></span>
-              Dark Luxury
-            </button>
-            <button type="button" class="preset-pill" data-preset="light">
-              <span class="color-dot" style="background: #ffffff; border-color: #cbd5e1;"></span>
-              Clean White
-            </button>
-            <button type="button" class="preset-pill" data-preset="warm-beige">
-              <span class="color-dot" style="background: #f7f4ee;"></span>
-              Warm Beige
-            </button>
-            <button type="button" class="preset-pill" data-preset="velvet-noir">
-              <span class="color-dot" style="background: #070709;"></span>
-              Velvet Noir
-            </button>
-            <button type="button" class="preset-pill" data-preset="editorial-white">
-              <span class="color-dot" style="background: #f4f4f5; border-color: #71717a;"></span>
-              Editorial
-            </button>
-          </div>
-        </div>
-
-        <!-- Custom Color Pickers -->
-        <div class="form-group color-picker-row">
-          <span class="form-label" style="margin-bottom: 0;">Warna Background</span>
-          <input type="color" id="input-bg-color" value="#0d0f12" />
-        </div>
-
-        <div class="form-group color-picker-row">
-          <span class="form-label" style="margin-bottom: 0;">Warna Teks</span>
-          <input type="color" id="input-text-color" value="#f8fafc" />
-        </div>
-
-        <div class="form-group color-picker-row">
-          <span class="form-label" style="margin-bottom: 0;">Warna Aksen</span>
-          <input type="color" id="input-accent-color" value="#3b82f6" />
-        </div>
-      </div>
-
-      <!-- 3. Layout (Masonry vs Grid) -->
-      <div class="sidebar-section">
-        <h4 class="sidebar-title">Tata Letak (Layout)</h4>
-        
-        <div class="form-group">
-          <label class="form-label">Tipe Galeri</label>
-          <div class="segmented-control">
-            <button type="button" class="segmented-btn active" data-layout="masonry">Masonry</button>
-            <button type="button" class="segmented-btn" data-layout="grid">Grid Kotak</button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Rasio Foto (Untuk Grid)</label>
-          <div class="segmented-control">
-            <button type="button" class="segmented-btn active" data-aspect="original">Original</button>
-            <button type="button" class="segmented-btn" data-aspect="portrait">4:5</button>
-            <button type="button" class="segmented-btn" data-aspect="landscape">16:10</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. Grid Columns & Spacing -->
-      <div class="sidebar-section">
-        <h4 class="sidebar-title">Kolom & Jarak</h4>
-
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <label class="form-label" style="margin-bottom: 0;">Kolom di PC / Laptop</label>
-            <span id="val-columns-desktop" class="range-value">3</span>
-          </div>
-          <div class="range-slider-wrapper">
-            <input type="range" id="input-columns-desktop" class="range-slider" min="2" max="6" value="3" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <label class="form-label" style="margin-bottom: 0;">Kolom di HP (Mobile)</label>
-            <span id="val-columns-mobile" class="range-value">1</span>
-          </div>
-          <div class="range-slider-wrapper">
-            <input type="range" id="input-columns-mobile" class="range-slider" min="1" max="2" value="1" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <label class="form-label" style="margin-bottom: 0;">Jarak Antar Foto (Gap)</label>
-            <span id="val-gallery-gap" class="range-value">16px</span>
-          </div>
-          <div class="range-slider-wrapper">
-            <input type="range" id="input-gallery-gap" class="range-slider" min="0" max="40" step="4" value="16" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <label class="form-label" style="margin-bottom: 0;">Lengkungan Sudut (Radius)</label>
-            <span id="val-border-radius" class="range-value">10px</span>
-          </div>
-          <div class="range-slider-wrapper">
-            <input type="range" id="input-border-radius" class="range-slider" min="0" max="24" step="2" value="10" />
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. Typography -->
-      <div class="sidebar-section">
-        <h4 class="sidebar-title">Gaya Huruf (Font)</h4>
-        <div class="form-group">
-          <select id="select-font-family" class="select-input">
-            <option value="'Plus Jakarta Sans', system-ui, sans-serif">Plus Jakarta Sans (Modern Clean)</option>
-            <option value="'Playfair Display', Georgia, serif">Playfair Display (Editorial / Wedding)</option>
-            <option value="'Cinzel', Georgia, serif">Cinzel (Luxury & Classical)</option>
-            <option value="'Inter', system-ui, sans-serif">Inter (Minimalist Tech)</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- 6. Hero Title & Subtitle -->
-      <div class="sidebar-section">
-        <h4 class="sidebar-title">Judul Galeri</h4>
-        <div class="form-group">
-          <label class="form-label" for="input-hero-title">Judul Utama</label>
-          <input type="text" id="input-hero-title" class="input-text" value="The Wedding Collection" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="input-hero-subtitle">Deskripsi / Tanggal</label>
-          <input type="text" id="input-hero-subtitle" class="input-text" value="A curated gallery of unforgettable moments and timeless memories." />
-        </div>
-      </div>
-
-    </aside>
-
-    <!-- ========================================================================
-         MAIN LIVE PREVIEW AREA
-         ======================================================================== -->
-    <main class="main-preview">
-      
-      <!-- HERO COVER SECTION -->
-      <section class="gallery-hero" id="gallery-hero-section">
-        <h1 class="gallery-title" id="display-hero-title">The Wedding Collection</h1>
-        <p class="gallery-subtitle" id="display-hero-subtitle">
-          A curated gallery of unforgettable moments and timeless memories.
-        </p>
-        <div class="gallery-meta-bar">
-          <span class="meta-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            Google Drive Synchronized
-          </span>
-          <span class="meta-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-            </svg>
-            Client Proofing Ready
-          </span>
-        </div>
-      </section>
-
-      <!-- GALLERY CONTROLS BAR -->
-      <div class="gallery-controls-bar">
-        <span class="photo-count-badge" id="display-photo-count">9 Foto</span>
-
-        <button id="btn-floating-fav-open" class="favorites-pill-btn" onclick="window.app?.openWhatsAppModal();">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-          Kirim Foto Pilihan
-        </button>
-      </div>
-
-      <!-- GALLERY PHOTOS GRID / MASONRY -->
-      <div id="gallery-container" class="gallery-container gallery-masonry">
-        <!-- Photo Cards dynamically injected by js/app.js -->
-      </div>
-
-    </main>
-
-  </div>
-
-  <!-- ========================================================================
-       LIGHTBOX (FULLSCREEN MODAL VIEWER)
-       ======================================================================== -->
-  <div id="lightbox-modal" class="lightbox-modal">
-    <div class="lightbox-header">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span id="lightbox-counter" style="font-size: 13px; color: #94a3b8; font-weight: 600;">1 / 9</span>
-        <span id="lightbox-title" class="lightbox-title">Photo Name</span>
-      </div>
-      
-      <div class="lightbox-actions">
-        <!-- Favorite in Lightbox -->
-        <button id="lightbox-favorite-btn" class="icon-action-btn" title="Tandai Favorit">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-        </button>
-
-        <!-- Download in Lightbox -->
-        <a id="lightbox-download-btn" href="#" class="icon-action-btn" title="Download Resolusi Penuh" target="_blank" download>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-        </a>
-
-        <!-- Close Lightbox -->
-        <button id="lightbox-close-btn" class="icon-action-btn" title="Tutup (Esc)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="lightbox-body">
-      <button id="lightbox-prev-btn" class="lightbox-nav-btn lightbox-prev" title="Sebelumnya (Panah Kiri)">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+    <div class="hero-cta-group">
+      <button class="btn btn-primary" style="padding: 12px 24px; font-size: 15px;" onclick="openKeyModal();">
+        🚀 Buat Galeri Sekarang
       </button>
-
-      <img id="lightbox-img" class="lightbox-img" src="" alt="Full view" />
-
-      <button id="lightbox-next-btn" class="lightbox-nav-btn lightbox-next" title="Berikutnya (Panah Kanan)">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
+      <a href="#mini-demo" class="btn btn-secondary" style="padding: 12px 20px; font-size: 15px;">
+        Lihat Live Demo ↓
+      </a>
     </div>
-  </div>
+  </section>
 
-  <!-- ========================================================================
-       FLOATING CLIENT WHATSAPP PROOFING BADGE
-       ======================================================================== -->
-  <button id="client-floating-badge" class="client-floating-badge" style="display: none;">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/>
-    </svg>
-    <span id="floating-fav-count">0 Foto Terpilih</span>
-  </button>
+  <!-- INTERACTIVE MINI-DEMO SHOWCASE SECTION -->
+  <section class="demo-section" id="mini-demo">
+    <div style="text-align: center; margin-bottom: 28px;">
+      <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 8px;">🎨 Coba Langsung Tampilan Galeri</h2>
+      <p style="font-size: 14px; color: var(--text-secondary);">
+        Klik preset tema dan tata letak di bawah untuk melihat bagaimana klien kamu akan menikmati hasil fotonya:
+      </p>
+    </div>
 
-  <!-- ========================================================================
-       MODAL: GOOGLE DRIVE API KEY SETUP
-       ======================================================================== -->
-  <div id="modal-api-key" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Pengaturan Google Drive API</h3>
-        <button class="btn btn-ghost btn-sm" data-close-modal>✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-          Untuk membaca isi folder Google Drive secara langsung, kamu butuh <b>Google Drive API Key</b> gratis dari Google Cloud Console.
-        </p>
-
-        <div class="form-group">
-          <label class="form-label" for="input-google-api-key">Google Drive API Key</label>
-          <input 
-            type="text" 
-            id="input-google-api-key" 
-            class="input-text" 
-            placeholder="AIzaSy..." 
-          />
-          <p class="form-hint">
-            Kunci ini disimpan aman hanya di browser kamu (localStorage) dan tidak dikirim ke server pihak ketiga.
-          </p>
+    <div class="demo-showcase-box">
+      <!-- Toolbar Controls -->
+      <div class="demo-toolbar">
+        <!-- Preset Theme Buttons -->
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tema:</span>
+          <button type="button" class="preset-pill active" onclick="switchDemoTheme('dark', this)">
+            <span class="color-dot" style="background: #0d0f12;"></span> Dark Luxury
+          </button>
+          <button type="button" class="preset-pill" onclick="switchDemoTheme('warm-beige', this)">
+            <span class="color-dot" style="background: #f7f4ee;"></span> Warm Beige
+          </button>
+          <button type="button" class="preset-pill" onclick="switchDemoTheme('velvet-noir', this)">
+            <span class="color-dot" style="background: #070709;"></span> Velvet Noir
+          </button>
+          <button type="button" class="preset-pill" onclick="switchDemoTheme('light', this)">
+            <span class="color-dot" style="background: #ffffff; border-color: #94a3b8;"></span> Clean White
+          </button>
         </div>
 
-        <div style="background-color: var(--card-bg); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
-          <b>Cara Cepat Dapatkan API Key Gratis:</b>
-          <ol style="margin-left: 18px; margin-top: 6px;">
-            <li>Buka <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--accent-color);">console.cloud.google.com</a></li>
-            <li>Aktifkan <b>Google Drive API</b> pada Library.</li>
-            <li>Buka menu <b>Credentials</b> &gt; klik <b>Create Credentials</b> &gt; pilih <b>API Key</b>.</li>
-          </ol>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary btn-sm" data-close-modal>Batal</button>
-        <button id="btn-save-api-key" class="btn btn-primary btn-sm">Simpan API Key</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       MODAL: SHARE LINK (COPY CUSTOM THEMED LINK)
-       ======================================================================== -->
-  <div id="modal-share" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Bagikan Galeri Klien</h3>
-        <button class="btn btn-ghost btn-sm" data-close-modal>✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-          Link ini sudah mengemas tema, tata letak, dan warna yang sudah kamu sesuaikan. Siapapun yang membuka link ini akan melihat galeri sesuai desain pilihanmu.
-        </p>
-
-        <div class="form-group">
-          <label class="form-label">Link Publik Galeri</label>
-          <div style="display: flex; gap: 8px;">
-            <input 
-              type="text" 
-              id="input-share-url" 
-              class="input-text" 
-              readonly 
-              style="cursor: text;"
-            />
-            <button id="btn-copy-share-url" class="btn btn-primary btn-sm">Salin</button>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary btn-sm" data-close-modal>Tutup</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       MODAL: WHATSAPP CLIENT SELECTION EXPORT
-       ======================================================================== -->
-  <div id="modal-whatsapp" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
+        <!-- Layout Controls -->
         <div style="display: flex; align-items: center; gap: 8px;">
-          <h3 class="modal-title">Daftar Foto Terpilih</h3>
-          <span id="modal-wa-count" style="font-size: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 2px 8px; border-radius: 999px; font-weight: 700;">0 Foto</span>
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tata Letak:</span>
+          <div class="segmented-control" style="background: rgba(0,0,0,0.2);">
+            <button type="button" class="segmented-btn active" id="btn-layout-masonry" onclick="switchDemoLayout('masonry')">Masonry</button>
+            <button type="button" class="segmented-btn" id="btn-layout-grid" onclick="switchDemoLayout('grid')">Grid Kotak</button>
+          </div>
         </div>
-        <button class="btn btn-ghost btn-sm" data-close-modal>✕</button>
+      </div>
+
+      <!-- Live Canvas Preview -->
+      <div class="demo-canvas" id="demo-preview-canvas" style="background: #0d0f12; color: #f8fafc;">
+        <div style="text-align: center; margin-bottom: 36px;">
+          <h3 id="demo-title" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 6px;">The Wedding of Sarah & David</h3>
+          <p id="demo-subtitle" style="font-size: 14px; opacity: 0.7;">Bali, 24 October 2026 • Timeless Memories</p>
+        </div>
+
+        <div id="demo-gallery-grid" class="gallery-container gallery-masonry" style="padding: 0; max-width: 100%;">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES OVERVIEW -->
+  <section class="features-section">
+    <div style="text-align: center;">
+      <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Kenapa Fotografer Memilih CeEZe Studio?</h2>
+      <p style="font-size: 14px; color: var(--text-secondary); max-width: 500px; margin: 0 auto;">
+        Semua yang kamu butuhkan untuk menghadirkan pengalaman klien yang profesional dan aman.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-box">☁️</div>
+        <h4 style="font-size: 17px; font-weight: 700; margin-bottom: 10px;">0 Biaya Hosting Penyimpanan</h4>
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">
+          Foto resolusi tinggi tetap berada di Google Drive kamu. Bandwidth dan CDN cepat ditanggung oleh server Google secara gratis.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">💬</div>
+        <h4 style="font-size: 17px; font-weight: 700; margin-bottom: 10px;">Client Proofing via WhatsApp</h4>
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">
+          Klien tinggal menekan tombol hati (❤️) pada foto yang mereka sukai. Daftarnya otomatis terformat dan terkirim ke WhatsApp studio dalam 1 klik.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">⏳</div>
+        <h4 style="font-size: 17px; font-weight: 700; margin-bottom: 10px;">Batas Masa Aktif (Expiration)</h4>
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">
+          Tentukan masa tayang galeri (misal 14 atau 30 hari). Setelahnya akses otomatis terkunci untuk mendorong klien segera memilih foto.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-box">🔑</div>
+        <h4 style="font-size: 17px; font-weight: 700; margin-bottom: 10px;">Sistem Key & Kuota Galeri</h4>
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">
+          Kamu bisa menerbitkan Key unik (misal untuk Aris: 2 galeri). Jika kuota habis, pembuatan galeri ke-3 otomatis dibatasi oleh sistem.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top: 1px solid var(--border-color); padding: 40px 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
+    <div style="margin-bottom: 12px; font-weight: 700; color: var(--text-primary);">
+      CeEZe Studio Platform
+    </div>
+    <p>© 2026 CeEZe Studio. All rights reserved. • <a href="admin.html" style="color: var(--accent-color); text-decoration: none;">Admin Portal</a></p>
+  </footer>
+
+  <!-- MODAL: ENTER LICENSE KEY TO CREATE GALLERY -->
+  <div id="modal-key-entry" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Mulai Buat Galeri</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeKeyModal();">✕</button>
       </div>
       <div class="modal-body">
-        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
-          Klien bisa langsung mengirimkan nomor/nama foto yang mereka sukai ke WhatsApp fotografer atau menyalin daftarnya.
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+          Masukkan <b>License Key Unik</b> yang kamu dapatkan dari Admin untuk membuka editor galeri:
         </p>
 
-        <!-- List of selected photos -->
-        <div id="modal-wa-list" style="max-height: 180px; overflow-y: auto; margin-bottom: 16px; padding: 4px 8px; background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color);">
-          <!-- Injected dynamically -->
-        </div>
-
         <div class="form-group">
-          <label class="form-label" for="input-wa-number">Nomor WhatsApp Fotografer / Studio (Opsional)</label>
+          <label class="form-label" for="input-home-key">Kode Key Unik</label>
           <input 
             type="text" 
-            id="input-wa-number" 
+            id="input-home-key" 
             class="input-text" 
-            placeholder="Contoh: 6281234567890" 
+            placeholder="Contoh: CEEZE-ARIS-XXXX" 
+            style="text-transform: uppercase; font-family: monospace; font-weight: 700;"
           />
-          <p class="form-hint">Gunakan kode negara (misal 62 untuk Indonesia).</p>
+          <p id="home-key-error" class="form-hint" style="color: #ef4444; display: none; margin-top: 6px;"></p>
+        </div>
+
+        <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+          Belum punya key akses? Hubungi Admin CeEZe Studio untuk membuatkan kuota galeri kamu.
         </div>
       </div>
       <div class="modal-footer">
-        <button id="btn-copy-fav-list" class="btn btn-secondary btn-sm">Salin Daftar</button>
-        <button id="btn-send-whatsapp" class="btn btn-primary btn-sm" style="background-color: #25d366; border-color: #25d366;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/>
-          </svg>
-          Kirim ke WhatsApp
-        </button>
+        <button class="btn btn-secondary btn-sm" onclick="closeKeyModal();">Batal</button>
+        <button id="btn-submit-home-key" class="btn btn-primary btn-sm">Buka Studio Editor →</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification element -->
   <div id="toast" class="toast">Notifikasi</div>
 
-  <!-- Scripts -->
+  <!-- Dependencies -->
   <script src="js/demo-data.js"></script>
-  <script src="js/drive.js"></script>
-  <script src="js/editor.js"></script>
-  <script src="js/lightbox.js"></script>
-  <script src="js/favorites.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
 
+  <!-- Homepage Logic -->
+  <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function openKeyModal() {
+      document.getElementById('modal-key-entry').classList.add('active');
+    }
+
+    function closeKeyModal() {
+      document.getElementById('modal-key-entry').classList.remove('active');
+    }
+
+    // Mini-Demo Preset Theme Switcher
+    const DEMO_THEMES = {
+      'dark': { bg: '#0d0f12', text: '#f8fafc', font: "'Plus Jakarta Sans', sans-serif" },
+      'warm-beige': { bg: '#f7f4ee', text: '#292524', font: "'Playfair Display', serif" },
+      'velvet-noir': { bg: '#070709', text: '#fafaf9', font: "'Cinzel', serif" },
+      'light': { bg: '#ffffff', text: '#18181b', font: "'Inter', sans-serif" }
+    };
+
+    function switchDemoTheme(presetKey, btnEl) {
+      const theme = DEMO_THEMES[presetKey];
+      if (!theme) return;
+
+      document.querySelectorAll('.preset-pill').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+
+      const canvas = document.getElementById('demo-preview-canvas');
+      const title = document.getElementById('demo-title');
+      
+      canvas.style.backgroundColor = theme.bg;
+      canvas.style.color = theme.text;
+      title.style.fontFamily = theme.font;
+    }
+
+    function switchDemoLayout(layout) {
+      const container = document.getElementById('demo-gallery-grid');
+      const btnMasonry = document.getElementById('btn-layout-masonry');
+      const btnGrid = document.getElementById('btn-layout-grid');
+
+      if (layout === 'masonry') {
+        container.className = "gallery-container gallery-masonry";
+        btnMasonry.classList.add('active');
+        btnGrid.classList.remove('active');
+      } else {
+        container.className = "gallery-container gallery-grid";
+        btnGrid.classList.add('active');
+        btnMasonry.classList.remove('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Render first 6 demo photos for showcase
+      const container = document.getElementById('demo-gallery-grid');
+      if (container && window.DEMO_PHOTOS) {
+        window.DEMO_PHOTOS.slice(0, 6).forEach(photo => {
+          const card = document.createElement('div');
+          card.className = "photo-card";
+          card.innerHTML = `
+            <img src="${photo.previewUrl}" alt="${photo.name}" class="photo-img" loading="lazy" />
+            <div class="photo-overlay">
+              <div class="photo-bottom-info">
+                <p class="photo-name">${photo.name}</p>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      // Key Submission
+      document.getElementById('btn-submit-home-key')?.addEventListener('click', () => {
+        const val = document.getElementById('input-home-key')?.value;
+        const res = AuthService.validateKey(val);
+        const errEl = document.getElementById('home-key-error');
+
+        if (!res.valid) {
+          errEl.textContent = res.reason;
+          errEl.style.display = 'block';
+          return;
+        }
+
+        localStorage.setItem('ceeze_active_key', val.trim().toUpperCase());
+        window.location.href = `editor.html?key=${encodeURIComponent(val.trim().toUpperCase())}`;
+      });
+    });
+  </script>
 </body>
 </html>

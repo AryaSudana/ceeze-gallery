@@ -47,11 +47,21 @@
     width: 100vw;
     height: calc(100vh - 56px);
     z-index: 80;
-    background-color: var(--bg-color);
+    background-color: var(--bg-secondary);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
   }
 
   .editor-sidebar.collapsed {
     transform: translateY(100%);
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  /* Floating mobile edit button */
+  #btn-floating-mobile-edit {
+    display: inline-flex !important;
+    animation: bounceIn 0.3s ease;
   }
 
   .gallery-container {
@@ -115,14 +125,36 @@
     font-size: 12px;
   }
 
-  /* Show photo overlay on mobile by default or with a subtle bottom bar */
+  /* Sleek, Non-intrusive Mobile Photo Card Actions */
   .photo-overlay {
-    opacity: 1;
-    background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 60%, rgba(0,0,0,0.6) 100%);
+    opacity: 1 !important;
+    background: transparent !important;
+    padding: 8px !important;
+    pointer-events: none;
   }
 
   .photo-top-actions {
-    opacity: 1;
+    opacity: 1 !important;
+    gap: 6px !important;
+    pointer-events: auto;
+  }
+
+  .icon-action-btn {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(6px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .icon-action-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .photo-bottom-info {
+    display: none !important;
   }
 }
 
@@ -132,8 +164,14 @@
     transform: none;
   }
 
-  .icon-action-btn {
-    width: 42px;
-    height: 42px;
+  /* Keep photo card action icons compact and subtle on touch screens */
+  .photo-top-actions .icon-action-btn {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .photo-top-actions .icon-action-btn svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 }

@@ -20,10 +20,11 @@ class App {
 
     // Check URL query parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const folderParam = urlParams.get('folder');
-    const viewParam = urlParams.get('view');
+    const folderParam = urlParams.get('f') || urlParams.get('folder');
+    const isEditParam = urlParams.get('edit') === '1' || urlParams.get('mode') === 'editor';
 
-    if (viewParam === 'client') {
+    // If folder is present and NOT in edit mode, default immediately to CLEAN CLIENT VIEW
+    if (folderParam && !isEditParam) {
       this.setClientMode(true);
     }
 
@@ -133,21 +134,34 @@ class App {
     const btnShare = document.getElementById('btn-open-share-modal');
     if (btnShare) {
       btnShare.addEventListener('click', () => {
-        const shareUrl = this.editor.saveConfig();
-        const shareInput = document.getElementById('input-share-url');
-        if (shareInput) shareInput.value = shareUrl;
+        const shareLinks = this.editor.saveConfig();
+        const clientInput = document.getElementById('input-share-client-url');
+        const editorInput = document.getElementById('input-share-editor-url');
+        if (clientInput) clientInput.value = shareLinks.clientUrl;
+        if (editorInput) editorInput.value = shareLinks.editorUrl;
         this.openModal('modal-share');
       });
     }
 
-    // Copy Share Link Button
-    const btnCopyShare = document.getElementById('btn-copy-share-url');
-    if (btnCopyShare) {
-      btnCopyShare.addEventListener('click', () => {
-        const shareInput = document.getElementById('input-share-url');
-        if (shareInput) {
-          navigator.clipboard.writeText(shareInput.value);
-          window.showToast("📋 Link galeri berhasil disalin!");
+    // Copy Share Link Buttons
+    const btnCopyClient = document.getElementById('btn-copy-client-url');
+    if (btnCopyClient) {
+      btnCopyClient.addEventListener('click', () => {
+        const input = document.getElementById('input-share-client-url');
+        if (input) {
+          navigator.clipboard.writeText(input.value);
+          window.showToast("📋 Link Klien berhasil disalin!");
+        }
+      });
+    }
+
+    const btnCopyEditor = document.getElementById('btn-copy-editor-url');
+    if (btnCopyEditor) {
+      btnCopyEditor.addEventListener('click', () => {
+        const input = document.getElementById('input-share-editor-url');
+        if (input) {
+          navigator.clipboard.writeText(input.value);
+          window.showToast("📋 Link Editor berhasil disalin!");
         }
       });
     }
@@ -211,31 +225,34 @@ class App {
     const sidebar = document.getElementById('editor-sidebar');
     const toggleViewBtn = document.getElementById('btn-toggle-view');
     const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
+    const apiBtn = document.getElementById('btn-open-api-modal');
 
     if (isClient) {
       if (sidebar) sidebar.classList.add('collapsed');
       if (toggleSidebarBtn) toggleSidebarBtn.style.display = 'none';
+      if (apiBtn) apiBtn.style.display = 'none';
       if (toggleViewBtn) {
         toggleViewBtn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
           </svg>
-          Mode Editor
+          <span class="hide-mobile">Edit Galeri</span>
         `;
         toggleViewBtn.classList.remove('btn-secondary');
-        toggleViewBtn.classList.add('btn-primary');
+        toggleViewBtn.classList.add('btn-ghost');
       }
     } else {
       if (sidebar) sidebar.classList.remove('collapsed');
       if (toggleSidebarBtn) toggleSidebarBtn.style.display = 'inline-flex';
+      if (apiBtn) apiBtn.style.display = 'inline-flex';
       if (toggleViewBtn) {
         toggleViewBtn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
           </svg>
-          Preview Klien
+          <span class="hide-mobile">Preview Klien</span>
         `;
-        toggleViewBtn.classList.remove('btn-primary');
+        toggleViewBtn.classList.remove('btn-ghost');
         toggleViewBtn.classList.add('btn-secondary');
       }
     }

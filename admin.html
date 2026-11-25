@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CeEZe Studio - Master Admin Portal</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👑</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .admin-container {
+      max-width: 1080px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    .admin-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent-color);
+      margin-top: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .badge-quota {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 11.5px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
+
+    .badge-full {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="top-header">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <a href="index.html" class="brand">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #eab308, #ef4444);">👑</div>
+        <span class="brand-title">CeEZe Admin Portal</span>
+      </a>
+    </div>
+
+    <div class="header-actions">
+      <a href="index.html" class="btn btn-ghost btn-sm">Lihat Website</a>
+      <button id="btn-admin-logout" class="btn btn-secondary btn-sm" style="display: none;">Logout</button>
+    </div>
+  </header>
+
+  <!-- MASTER PIN GATE MODAL -->
+  <div id="modal-pin-gate" class="modal-backdrop active">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🔐 Master Admin Login</h3>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Masukkan Master PIN Admin kamu untuk membuka panel kontrol lisensi & kuota.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="input-master-pin">Master PIN</label>
+          <input 
+            type="password" 
+            id="input-master-pin" 
+            class="input-text" 
+            placeholder="Masukkan Master PIN..." 
+            autocomplete="off"
+            style="letter-spacing: 2px;"
+          />
+          <p id="pin-error-msg" class="form-hint" style="color: #ef4444; display: none;">PIN salah, silakan coba lagi.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-submit-pin" class="btn btn-primary btn-sm" style="width: 100%;">Masuk ke Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN MAIN CONTENT -->
+  <div class="admin-container" id="admin-main-view" style="display: none;">
+
+    <!-- STATS OVERVIEW -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">Total Key Terbit</div>
+        <div class="stat-num" id="stat-total-keys">0</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">Total Galeri Aktif</div>
+        <div class="stat-num" id="stat-total-galleries" style="color: #10b981;">0</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">Status Server & Domain</div>
+        <div class="stat-num" style="font-size: 20px; font-weight: 700; color: #10b981; padding-top: 8px;">
+          Aktif (Vercel)
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM: GENERATE NEW KEY -->
+    <div class="admin-card">
+      <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 6px;">✨ Terbitkan Key Unik Klien Baru</h3>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
+        Contoh: Buatkan key untuk "Aris" dengan kuota maksimal 2 galeri.
+      </p>
+
+      <form id="form-create-key" style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 14px; align-items: flex-end;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="input-client-name">Nama Pengguna / Klien</label>
+          <input type="text" id="input-client-name" class="input-text" placeholder="Contoh: Aris Wedding" required />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="input-max-quota">Maksimal Galeri (Kuota)</label>
+          <input type="number" id="input-max-quota" class="input-text" min="1" max="100" value="2" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="height: 42px;">
+          + Buat Key
+        </button>
+      </form>
+    </div>
+
+    <!-- TABLE: ACTIVE KEYS & QUOTAS -->
+    <div class="admin-card">
+      <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 16px;">📋 Daftar Key & Status Kuota Pengguna</h3>
+
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Klien</th>
+              <th>License Key Unik</th>
+              <th>Kuota Terpakai</th>
+              <th>Tanggal Terbit</th>
+              <th style="text-align: right;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="keys-table-body">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS: CHANGE PIN -->
+    <div class="admin-card" style="max-width: 500px;">
+      <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">🔒 Ubah Master Admin PIN</h3>
+      <div class="form-group">
+        <label class="form-label" for="input-new-pin">PIN Baru (Minimal 4 karakter)</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="input-new-pin" class="input-text" placeholder="PIN baru..." />
+          <button id="btn-update-pin" class="btn btn-secondary btn-sm">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast" class="toast">Notifikasi</div>
+
+  <!-- Dependencies -->
+  <script src="js/auth.js"></script>
+
+  <!-- Admin Controller -->
+  <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const sessionLoggedIn = sessionStorage.getItem('ceeze_admin_auth');
+      if (sessionLoggedIn === 'true') {
+        unlockAdminView();
+      }
+
+      // PIN Submit
+      document.getElementById('btn-submit-pin')?.addEventListener('click', () => {
+        const pin = document.getElementById('input-master-pin')?.value;
+        if (AuthService.verifyAdminPin(pin)) {
+          sessionStorage.setItem('ceeze_admin_auth', 'true');
+          unlockAdminView();
+        } else {
+          document.getElementById('pin-error-msg').style.display = 'block';
+        }
+      });
+
+      // Logout
+      document.getElementById('btn-admin-logout')?.addEventListener('click', () => {
+        sessionStorage.removeItem('ceeze_admin_auth');
+        window.location.reload();
+      });
+
+      // Create Key Form
+      document.getElementById('form-create-key')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('input-client-name')?.value;
+        const quota = document.getElementById('input-max-quota')?.value;
+
+        if (!name) return;
+        const newKey = AuthService.createLicenseKey(name, quota);
+        showToast(`✅ Berhasil membuat key untuk ${name}: ${newKey.key}`);
+
+        // Reset form
+        document.getElementById('input-client-name').value = '';
+        document.getElementById('input-max-quota').value = '2';
+        refreshAdminData();
+      });
+
+      // Update PIN
+      document.getElementById('btn-update-pin')?.addEventListener('click', () => {
+        const newPin = document.getElementById('input-new-pin')?.value;
+        if (AuthService.setAdminPin(newPin)) {
+          showToast("✅ Master PIN berhasil diubah!");
+          document.getElementById('display-current-pin').textContent = newPin;
+          document.getElementById('input-new-pin').value = '';
+        } else {
+          showToast("⚠️ PIN minimal 4 karakter");
+        }
+      });
+    });
+
+    function unlockAdminView() {
+      document.getElementById('modal-pin-gate').classList.remove('active');
+      document.getElementById('admin-main-view').style.display = 'block';
+      document.getElementById('btn-admin-logout').style.display = 'inline-flex';
+      document.getElementById('display-current-pin').textContent = AuthService.getAdminPin();
+      refreshAdminData();
+    }
+
+    function refreshAdminData() {
+      const keys = AuthService.getAllKeys();
+      const meta = AuthService.getAllGalleriesMeta();
+
+      // Stats
+      document.getElementById('stat-total-keys').textContent = keys.length;
+      document.getElementById('stat-total-galleries').textContent = Object.keys(meta).length;
+
+      // Render Table
+      const tbody = document.getElementById('keys-table-body');
+      tbody.innerHTML = '';
+
+      if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Belum ada key yang diterbitkan.</td></tr>`;
+        return;
+      }
+
+      keys.forEach(k => {
+        const isFull = k.usedGalleries >= k.maxGalleries;
+        const badgeClass = isFull ? 'badge-quota badge-full' : 'badge-quota';
+        const formattedDate = new Date(k.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        
+        // Link direct to editor with key
+        const domainOrigin = window.location.protocol === 'file:' 
+          ? 'https://ceeze-studio.my.id' 
+          : window.location.origin;
+
+        const editorDirectUrl = `${domainOrigin}/editor.html?key=${k.key}`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b>${k.clientName}</b></td>
+          <td>
+            <code style="background: var(--bg-color); padding: 4px 8px; border-radius: 6px; font-weight: 700; color: var(--accent-color);">${k.key}</code>
+          </td>
+          <td>
+            <span class="${badgeClass}">${k.usedGalleries} / ${k.maxGalleries} Galeri</span>
+          </td>
+          <td style="color: var(--text-muted); font-size: 12.5px;">${formattedDate}</td>
+          <td style="text-align: right;">
+            <button class="btn btn-secondary btn-sm" onclick="copyEditorLink('${editorDirectUrl}');" title="Salin Link Editor Langsung">
+              Salin Link Editor
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="deleteKey('${k.key}');" style="color: #ef4444;" title="Hapus Key">
+              Hapus
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function copyEditorLink(url) {
+      navigator.clipboard.writeText(url);
+      showToast("📋 Link Editor langsung sudah disalin! Kirimkan link ini ke klien kamu.");
+    }
+
+    function deleteKey(key) {
+      if (confirm(`Yakin ingin menghapus key ${key}? Pengguna tidak akan bisa membuat galeri baru.`)) {
+        AuthService.deleteLicenseKey(key);
+        showToast("Key berhasil dihapus.");
+        refreshAdminData();
+      }
+    }
+  </script>
+</body>
+</html>

@@ -561,6 +561,22 @@ input[type="color"]::-webkit-color-swatch {
   width: 100%;
 }
 
+/* Left-to-Right Sequential Masonry Flow */
+.gallery-masonry-flow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gallery-gap);
+  width: 100%;
+}
+
+.masonry-column-track {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gallery-gap);
+  min-width: 0;
+}
+
 /* 2. Standard Grid Style (Uniform boxes) */
 .gallery-grid {
   display: grid;
@@ -902,4 +918,389 @@ input[type="color"]::-webkit-color-swatch {
 .toast.show {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
+}
+
+/* ==========================================================================
+   Fixed Studio Editor UI (Sidebar, Header, Brand, Sliders remain 100% fixed dark)
+   ========================================================================== */
+body.editor-page {
+  background-color: #080a0f !important;
+  color: #f8fafc !important;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Fixed Studio Header */
+body.editor-page .top-header,
+.top-header {
+  background-color: #0f1218 !important;
+  color: #f8fafc !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.editor-page .top-header *,
+.top-header * {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+}
+
+body.editor-page .top-header .brand-title,
+.top-header .brand-title {
+  color: #ffffff !important;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+  font-weight: 800 !important;
+}
+
+body.editor-page .top-header .brand-icon,
+.top-header .brand-icon {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+}
+
+body.editor-page .top-header .btn-secondary {
+  background-color: #171b24 !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.editor-page .top-header .btn-secondary:hover {
+  background-color: #212634 !important;
+  color: #ffffff !important;
+}
+
+body.editor-page .top-header .btn-primary {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Fixed Header Device Switcher */
+body.editor-page .device-switcher-group {
+  background-color: #151821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.editor-page .device-switch-btn {
+  color: #94a3b8 !important;
+}
+
+body.editor-page .device-switch-btn:hover {
+  color: #ffffff !important;
+}
+
+body.editor-page .device-switch-btn.active {
+  background-color: #232836 !important;
+  color: #60a5fa !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Fixed Studio Editor Sidebar */
+.editor-sidebar {
+  background-color: #12151d !important;
+  color: #f8fafc !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  --accent-color: #3b82f6 !important;
+}
+
+.editor-sidebar * {
+  --text-primary: #f8fafc !important;
+  --text-secondary: #94a3b8 !important;
+  --text-muted: #64748b !important;
+  --border-color: rgba(255, 255, 255, 0.1) !important;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+}
+
+.editor-sidebar .sidebar-title {
+  color: #ffffff !important;
+}
+
+.editor-sidebar .section-title {
+  color: #94a3b8 !important;
+}
+
+.editor-sidebar .form-label {
+  color: #cbd5e1 !important;
+}
+
+.editor-sidebar .form-hint {
+  color: #64748b !important;
+}
+
+/* Range Sliders inside Editor Sidebar (Fixed Thumb & Track Color) */
+.editor-sidebar .range-slider {
+  accent-color: #3b82f6 !important;
+}
+
+.editor-sidebar .range-slider::-webkit-slider-thumb {
+  background: #3b82f6 !important;
+}
+
+.editor-sidebar .range-slider::-moz-range-thumb {
+  background: #3b82f6 !important;
+}
+
+.editor-sidebar .range-value {
+  color: #60a5fa !important;
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  font-family: 'Plus Jakarta Sans', monospace, sans-serif !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+}
+
+.editor-sidebar .input-text,
+.editor-sidebar .select-input {
+  background-color: #0a0c10 !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.editor-sidebar .input-text:focus,
+.editor-sidebar .select-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+}
+
+.editor-sidebar .segmented-control {
+  background-color: #0a0c10 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.editor-sidebar .segmented-btn {
+  color: #94a3b8 !important;
+}
+
+.editor-sidebar .segmented-btn.active {
+  background-color: #202634 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+}
+
+.editor-sidebar .preset-pill {
+  background-color: #0a0c10 !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.editor-sidebar .preset-pill:hover,
+.editor-sidebar .preset-pill.active {
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+/* Workspace Canvas Area inside Editor */
+body.editor-page .main-preview {
+  background-color: #080a0f !important;
+}
+
+body.editor-page .main-preview:not(.mode-mobile-preview) .preview-viewport-wrapper {
+  background-color: var(--bg-color, #0d0f12);
+  color: var(--text-primary, #f8fafc);
+  min-height: 100%;
+  width: 100%;
+}
+
+/* Visibility Utilities for Mobile & Desktop */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Device Switcher & Smartphone Mockup Frame
+   ========================================================================== */
+.device-switcher-group {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.device-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.device-switch-btn:hover {
+  color: var(--text-primary);
+}
+
+.device-switch-btn.active {
+  background-color: var(--bg-secondary);
+  color: var(--accent-color);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Default Desktop Viewport Wrapper */
+.preview-viewport-wrapper {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--bg-color, #0d0f12);
+  color: var(--text-primary, #f8fafc);
+  font-family: var(--font-family);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.phone-notch,
+.phone-home-bar {
+  display: none;
+}
+
+.viewport-scroll-content {
+  width: 100%;
+  height: 100%;
+}
+
+/* Mobile Simulation Mode (Morphs into a sleek Smartphone Mockup) */
+.main-preview.mode-mobile-preview {
+  background: #06080d !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: 36px 16px !important;
+  overflow-y: auto !important;
+}
+
+.main-preview.mode-mobile-preview .preview-viewport-wrapper {
+  width: 390px !important;
+  max-width: 100% !important;
+  height: 780px !important;
+  max-height: calc(100vh - 140px) !important;
+  border: 12px solid #1c202c !important;
+  border-radius: 46px !important;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 0 2px rgba(255, 255, 255, 0.08) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background-color: var(--bg-color) !important;
+  flex-shrink: 0;
+  animation: zoomPhone 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes zoomPhone {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.main-preview.mode-mobile-preview .phone-notch {
+  display: block !important;
+  position: absolute !important;
+  top: 12px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 96px !important;
+  height: 22px !important;
+  background: #000000 !important;
+  border-radius: 20px !important;
+  z-index: 50 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Smartphone Home Indicator Bar at bottom (like iPhone Home Bar) */
+.main-preview.mode-mobile-preview .phone-home-bar {
+  display: block !important;
+  position: absolute !important;
+  bottom: 8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 120px !important;
+  height: 4px !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  border-radius: 999px !important;
+  z-index: 50 !important;
+  pointer-events: none;
+}
+
+.main-preview.mode-mobile-preview .viewport-scroll-content {
+  height: 100% !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-top: 24px !important;
+  padding-bottom: 24px !important;
+}
+
+/* Force mobile columns and mobile styles inside the phone frame */
+.main-preview.mode-mobile-preview .gallery-container {
+  padding: 0 14px 60px !important;
+}
+
+.main-preview.mode-mobile-preview .gallery-masonry {
+  column-count: var(--columns-mobile, 1) !important;
+}
+
+.main-preview.mode-mobile-preview .gallery-grid {
+  grid-template-columns: repeat(var(--columns-mobile, 1), 1fr) !important;
+}
+
+.main-preview.mode-mobile-preview .gallery-hero {
+  padding: 44px 16px 24px !important;
+}
+
+.main-preview.mode-mobile-preview .gallery-title {
+  font-size: 24px !important;
+}
+
+.main-preview.mode-mobile-preview .gallery-subtitle {
+  font-size: 13px !important;
+}
+
+.main-preview.mode-mobile-preview .gallery-controls-bar {
+  padding: 12px 14px !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+/* Compact Non-intrusive Photo Card Actions inside Mockup */
+.main-preview.mode-mobile-preview .photo-overlay {
+  opacity: 1 !important;
+  background: transparent !important;
+  padding: 8px !important;
+  pointer-events: none;
+}
+
+.main-preview.mode-mobile-preview .photo-top-actions {
+  opacity: 1 !important;
+  gap: 6px !important;
+  pointer-events: auto;
+}
+
+.main-preview.mode-mobile-preview .icon-action-btn {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  background-color: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(6px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.main-preview.mode-mobile-preview .icon-action-btn svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+.main-preview.mode-mobile-preview .photo-bottom-info {
+  display: none !important;
 }

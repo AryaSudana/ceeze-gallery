@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CeEZe Studio - Gallery Editor</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="editor-page">
+
+  <!-- TOP HEADER -->
+  <header class="top-header">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <!-- Toggle Sidebar Button for Mobile & Desktop -->
+      <button id="btn-toggle-sidebar" class="btn btn-secondary btn-sm" title="Buka/Tutup Menu Editor">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <span class="hide-mobile" id="toggle-sidebar-text">Menu Editor</span>
+      </button>
+
+      <a href="index.html" class="brand">
+        <div class="brand-icon" style="font-size: 13px; font-weight: 800;">CZ</div>
+        <span class="brand-title">CeEZe Studio</span>
+      </a>
+      <span id="client-badge" style="font-size: 12px; background: rgba(59, 130, 246, 0.15); color: #3b82f6; padding: 4px 10px; border-radius: 999px; font-weight: 600;">
+        User: <span id="client-name">Validating...</span>
+      </span>
+    </div>
+
+    <div class="header-actions">
+      <!-- Device Viewport Switcher (Desktop vs Mobile Mockup) -->
+      <div class="device-switcher-group hide-mobile">
+        <button type="button" id="btn-device-desktop" class="device-switch-btn active" title="Tampilan Layar Desktop / PC">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span>Desktop</span>
+        </button>
+        <button type="button" id="btn-device-mobile" class="device-switch-btn" title="Pratinjau Layar Smartphone (HP)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          <span>Mobile</span>
+        </button>
+      </div>
+
+      <!-- Direct View as Client Button -->
+      <a id="btn-preview-client-link" href="gallery.html?f=demo" target="_blank" class="btn btn-secondary btn-sm" title="Buka tampilan bersih klien">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span class="hide-mobile">Lihat Tampilan Klien</span>
+      </a>
+
+      <!-- Publish & Share Button -->
+      <button id="btn-publish-gallery" class="btn btn-primary btn-sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        <span>Publish</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- KEY VALIDATION GATE (IF NOT LOGGED IN / NO KEY) -->
+  <div id="auth-gate-modal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Masukkan Key Unik Akses</h3>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+          Halaman editor ini khusus untuk pengguna yang memiliki <b>License Key Unik</b> dari Admin CeEZe Studio.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="input-auth-key">Kode Key Unik</label>
+          <input 
+            type="text" 
+            id="input-auth-key" 
+            class="input-text" 
+            placeholder="Contoh: CEEZE-ARIS-XXXX" 
+            style="text-transform: uppercase; font-family: monospace; font-weight: 700;"
+          />
+          <p id="auth-error-msg" class="form-hint" style="color: #ef4444; display: none; margin-top: 6px;"></p>
+        </div>
+
+        <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; color: var(--text-muted);">
+          Belum punya key? Hubungi Admin Studio untuk membuatkan kuota galeri baru kamu.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="index.html" class="btn btn-secondary btn-sm">Kembali ke Beranda</a>
+        <button id="btn-submit-key" class="btn btn-primary btn-sm">Masuk ke Editor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR WORKSPACE -->
+  <div class="app-container">
+
+    <!-- SIDEBAR CUSTOMIZER -->
+    <aside id="editor-sidebar" class="editor-sidebar">
+      
+      <!-- Mobile Close Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); position: sticky; top: 0; z-index: 20;">
+        <span style="font-weight: 700; font-size: 13.5px; color: var(--text-primary);">⚙️ Pengaturan Editor</span>
+        <button id="btn-close-sidebar-mobile" class="btn btn-secondary btn-sm" style="font-size: 11.5px;">✓ Lihat Preview</button>
+      </div>
+
+      <!-- 1. Google Drive Folder Source -->
+      <div class="sidebar-section">
+        <h4 class="sidebar-title">Sumber Folder Google Drive</h4>
+        <form id="form-load-folder" class="form-group">
+          <label class="form-label" for="input-folder-link">Link / Folder ID</label>
+          <input 
+            type="text" 
+            id="input-folder-link" 
+            class="input-text" 
+            placeholder="Tempel link Google Drive..." 
+            autocomplete="off"
+          />
+          <p class="form-hint">Pastikan folder: <i>"Anyone with the link can view"</i>.</p>
+          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 10px;">Muat Foto</button>
+        </form>
+      </div>
+
+      <!-- 2. Set Expiry Date (Keamanan Masa Aktif) -->
+      <div class="sidebar-section">
+        <h4 class="sidebar-title">Masa Aktif Galeri (Expired)</h4>
+        <div class="form-group">
+          <label class="form-label" for="select-expiry-days">Batas Waktu Akses Klien</label>
+          <select id="select-expiry-days" class="select-input">
+            <option value="7">7 Hari (1 Minggu)</option>
+            <option value="14">14 Hari (2 Minggu)</option>
+            <option value="30" selected>30 Hari (1 Bulan - Standar)</option>
+            <option value="90">90 Hari (3 Bulan)</option>
+            <option value="0">Selamanya (Tanpa Batas)</option>
+          </select>
+          <p class="form-hint">Setelah melewati masa ini, klien tidak bisa membuka foto lagi.</p>
+        </div>
+      </div>
+
+      <!-- 3. Theme & Colors -->
+      <div class="sidebar-section">
+        <h4 class="sidebar-title">Tema & Warna</h4>
+        <div class="form-group">
+          <label class="form-label">Preset Desain</label>
+          <div class="preset-grid">
+            <button type="button" class="preset-pill active" data-preset="dark">
+              <span class="color-dot" style="background: #0d0f12;"></span>
+              Dark Luxury
+            </button>
+            <button type="button" class="preset-pill" data-preset="light">
+              <span class="color-dot" style="background: #ffffff; border-color: #cbd5e1;"></span>
+              Clean White
+            </button>
+            <button type="button" class="preset-pill" data-preset="warm-beige">
+              <span class="color-dot" style="background: #f7f4ee;"></span>
+              Warm Beige
+            </button>
+            <button type="button" class="preset-pill" data-preset="velvet-noir">
+              <span class="color-dot" style="background: #070709;"></span>
+              Velvet Noir
+            </button>
+            <button type="button" class="preset-pill" data-preset="editorial-white">
+              <span class="color-dot" style="background: #f4f4f5; border-color: #71717a;"></span>
+              Editorial
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group color-picker-row">
+          <span class="form-label" style="margin-bottom: 0;">Warna Background</span>
+          <input type="color" id="input-bg-color" value="#0d0f12" />
+        </div>
+        <div class="form-group color-picker-row">
+          <span class="form-label" style="margin-bottom: 0;">Warna Teks</span>
+          <input type="color" id="input-text-color" value="#f8fafc" />
+        </div>
+        <div class="form-group color-picker-row">
+          <span class="form-label" style="margin-bottom: 0;">Warna Aksen</span>
+          <input type="color" id="input-accent-color" value="#3b82f6" />
+        </div>
+      </div>
+
+      <!-- 4. Layout & Grid -->
+      <div class="sidebar-section">
+        <h4 class="sidebar-title">Tata Letak (Layout)</h4>
+        
+        <div class="form-group">
+          <label class="form-label">Tipe Galeri</label>
+          <div class="segmented-control">
+            <button type="button" class="segmented-btn active" data-layout="masonry">Masonry</button>
+            <button type="button" class="segmented-btn" data-layout="grid">Grid Kotak</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Rasio Foto (Khusus Grid)</label>
+          <div class="segmented-control">
+            <button type="button" class="segmented-btn active" data-aspect="original">Original</button>
+            <button type="button" class="segmented-btn" data-aspect="portrait">4:5</button>
+            <button type="button" class="segmented-btn" data-aspect="landscape">16:10</button>
+          </div>
+        </div>
+
+        <!-- Slider 1: Kolom PC -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Kolom di PC / Laptop</label>
+            <span id="val-columns-desktop" class="range-value">3</span>
+          </div>
+          <div class="range-slider-wrapper">
+            <input type="range" id="input-columns-desktop" class="range-slider" min="2" max="6" value="3" />
+          </div>
+        </div>
+
+        <!-- Slider 2: Kolom HP (Mobile) -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Kolom di HP (Mobile)</label>
+            <span id="val-columns-mobile" class="range-value">1</span>
+          </div>
+          <div class="range-slider-wrapper">
+            <input type="range" id="input-columns-mobile" class="range-slider" min="1" max="2" value="1" />
+          </div>
+        </div>
+
+        <!-- Slider 3: Jarak Antar Foto (Gap) -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Jarak Antar Foto (Gap)</label>
+            <span id="val-gallery-gap" class="range-value">16px</span>
+          </div>
+          <div class="range-slider-wrapper">
+            <input type="range" id="input-gallery-gap" class="range-slider" min="0" max="40" step="4" value="16" />
+          </div>
+        </div>
+
+        <!-- Slider 4: Lengkungan Sudut (Radius) -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <label class="form-label" style="margin-bottom: 0;">Lengkungan Sudut (Radius)</label>
+            <span id="val-border-radius" class="range-value">10px</span>
+          </div>
+          <div class="range-slider-wrapper">
+            <input type="range" id="input-border-radius" class="range-slider" min="0" max="24" step="2" value="10" />
+          </div>
+        </div>
+
+        <!-- Sorting Order Selector -->
+        <div class="form-group" style="margin-top: 14px;">
+          <label class="form-label" for="select-sort-order">Urutan Tampilan Foto</label>
+          <select id="select-sort-order" class="select-input">
+            <option value="asc" selected>Nama Berurutan: 1 → 999 (A → Z)</option>
+            <option value="desc">Nama Terbalik: 999 → 1 (Z → A)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 5. Typography -->
+      <div class="sidebar-section">
+        <h4 class="sidebar-title">Gaya Huruf (Font)</h4>
+        <div class="form-group">
+          <select id="select-font-family" class="select-input">
+            <option value="'Plus Jakarta Sans', system-ui, sans-serif">Plus Jakarta Sans (Modern Clean)</option>
+            <option value="'Playfair Display', Georgia, serif">Playfair Display (Editorial / Wedding)</option>
+            <option value="'Cinzel', Georgia, serif">Cinzel (Luxury & Classical)</option>
+            <option value="'Inter', system-ui, sans-serif">Inter (Minimalist Tech)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 6. Titles -->
+      <div class="sidebar-section">
+        <h4 class="sidebar-title">Judul Galeri</h4>
+        <div class="form-group">
+          <label class="form-label" for="input-hero-title">Judul Utama</label>
+          <input type="text" id="input-hero-title" class="input-text" value="The Wedding Collection" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-hero-subtitle">Deskripsi</label>
+          <input type="text" id="input-hero-subtitle" class="input-text" value="A curated gallery of unforgettable moments and timeless memories." />
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- LIVE PREVIEW AREA -->
+    <main class="main-preview" id="main-preview-area">
+      <div class="preview-viewport-wrapper" id="preview-viewport-wrapper">
+        <div class="phone-notch"></div>
+        <div class="phone-home-bar"></div>
+        <div class="viewport-scroll-content">
+          
+          <section class="gallery-hero" id="gallery-hero-section">
+            <h1 class="gallery-title" id="display-hero-title">The Wedding Collection</h1>
+            <p class="gallery-subtitle" id="display-hero-subtitle">
+              A curated gallery of unforgettable moments and timeless memories.
+            </p>
+          </section>
+
+          <div class="gallery-controls-bar">
+            <span class="photo-count-badge" id="display-photo-count">Sample Demo</span>
+          </div>
+
+          <div id="gallery-container" class="gallery-container gallery-masonry"></div>
+
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- PUBLISH SUCCESS MODAL -->
+  <div id="modal-publish-success" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🎉 Galeri Berhasil Dibuat!</h3>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-publish-success');">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+          Galeri sudah resmi aktif dan kuota kamu telah diperbarui. Silakan salin link berikut untuk dikirimkan langsung ke klien kamu:
+        </p>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="color: #10b981; font-weight: 700;">📸 Link Bersih Khusus Klien:</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="input-published-client-url" class="input-text" readonly style="font-family: monospace; font-size: 12.5px;" />
+            <button id="btn-copy-published-url" class="btn btn-primary btn-sm">Salin Link</button>
+          </div>
+        </div>
+
+        <div id="published-expiry-info" style="background: var(--card-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12.5px; color: var(--text-secondary);">
+          ⏳ Masa aktif: <b>30 hari</b> (Klien bisa akses hingga tanggal yang ditentukan).
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a id="btn-open-published-tab" href="#" target="_blank" class="btn btn-secondary btn-sm">Buka Galeri di Tab Baru</a>
+        <button class="btn btn-primary btn-sm" onclick="closeModal('modal-publish-success');">Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING MOBILE TOGGLE BUTTON -->
+  <button id="btn-floating-mobile-edit" class="btn btn-primary hide-desktop" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40; border-radius: 999px; padding: 12px 24px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    ⚙️ Menu Editor
+  </button>
+
+  <div id="toast" class="toast">Notifikasi</div>
+
+  <!-- Dependencies -->
+  <script src="js/demo-data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/drive.js"></script>
+  <script src="js/editor.js"></script>
+
+  <!-- Editor Logic -->
+  <script>
+    let currentKey = null;
+    let editor = null;
+    let currentFolderId = "demo";
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      editor = new GalleryEditor();
+
+      // Device Viewport Switcher (Desktop vs Mobile Mockup Frame)
+      const btnDeviceDesktop = document.getElementById('btn-device-desktop');
+      const btnDeviceMobile = document.getElementById('btn-device-mobile');
+      const mainPreviewArea = document.getElementById('main-preview-area');
+
+      btnDeviceDesktop?.addEventListener('click', () => {
+        btnDeviceDesktop.classList.add('active');
+        btnDeviceMobile?.classList.remove('active');
+        mainPreviewArea?.classList.remove('mode-mobile-preview');
+        applySortAndRender();
+        showToast("🖥️ Mode Tampilan Layar Desktop (PC)");
+      });
+
+      btnDeviceMobile?.addEventListener('click', () => {
+        btnDeviceMobile.classList.add('active');
+        btnDeviceDesktop?.classList.remove('active');
+        mainPreviewArea?.classList.add('mode-mobile-preview');
+        applySortAndRender();
+        showToast("📱 Mode Pratinjau Mockup Smartphone (HP)");
+      });
+
+      // Sidebar Toggle Logic (Mobile & Desktop)
+      const sidebar = document.getElementById('editor-sidebar');
+      const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
+      const closeSidebarMobileBtn = document.getElementById('btn-close-sidebar-mobile');
+      const floatingMobileEditBtn = document.getElementById('btn-floating-mobile-edit');
+
+      function toggleSidebar() {
+        if (!sidebar) return;
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        if (floatingMobileEditBtn && window.innerWidth <= 768) {
+          floatingMobileEditBtn.style.display = isCollapsed ? 'inline-flex' : 'none';
+        }
+      }
+
+      if (toggleSidebarBtn) {
+        toggleSidebarBtn.addEventListener('click', toggleSidebar);
+      }
+      if (closeSidebarMobileBtn) {
+        closeSidebarMobileBtn.addEventListener('click', () => {
+          sidebar?.classList.add('collapsed');
+          if (floatingMobileEditBtn && window.innerWidth <= 768) {
+            floatingMobileEditBtn.style.display = 'inline-flex';
+          }
+        });
+      }
+      if (floatingMobileEditBtn) {
+        floatingMobileEditBtn.addEventListener('click', () => {
+          sidebar?.classList.remove('collapsed');
+          floatingMobileEditBtn.style.display = 'none';
+        });
+      }
+
+      // Check key and folder from URL param ?key=... & ?f=...
+      const urlParams = new URLSearchParams(window.location.search);
+      const keyParam = urlParams.get('key') || localStorage.getItem('ceeze_active_key');
+      const folderParam = urlParams.get('f') || urlParams.get('folder');
+
+      if (folderParam) {
+        currentFolderId = folderParam;
+        const linkInput = document.getElementById('input-folder-link');
+        if (linkInput) linkInput.value = folderParam;
+      }
+
+      updatePreviewClientLink();
+
+      if (keyParam) {
+        validateAndLoginKey(keyParam);
+      } else {
+        openModal('auth-gate-modal');
+      }
+
+      // Sort Order change listener
+      document.getElementById('select-sort-order')?.addEventListener('change', () => {
+        applySortAndRender();
+        updatePreviewClientLink();
+        showToast("Urutan foto diperbarui");
+      });
+
+      // Re-distribute columns when layout or sliders change
+      document.getElementById('input-columns-desktop')?.addEventListener('change', () => applySortAndRender());
+      document.getElementById('input-columns-mobile')?.addEventListener('change', () => applySortAndRender());
+      document.querySelectorAll('[data-layout]').forEach(b => {
+        b.addEventListener('click', () => setTimeout(applySortAndRender, 50));
+      });
+
+      // Submit Key button
+      document.getElementById('btn-submit-key')?.addEventListener('click', () => {
+        const val = document.getElementById('input-auth-key')?.value;
+        validateAndLoginKey(val);
+      });
+
+      // Folder Submit
+      document.getElementById('form-load-folder')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const link = document.getElementById('input-folder-link')?.value;
+        const extractedId = DriveService.extractFolderId(link);
+        if (!extractedId) {
+          showToast("⚠️ Link Google Drive tidak valid");
+          return;
+        }
+
+        currentFolderId = extractedId;
+        updatePreviewClientLink();
+        editor.init(extractedId);
+        loadPhotos(extractedId);
+        showToast("Memuat foto dari Google Drive...");
+      });
+
+      // Hook click on "Lihat Tampilan Klien" to sync latest design
+      document.getElementById('btn-preview-client-link')?.addEventListener('click', (e) => {
+        updatePreviewClientLink();
+      });
+
+      // Publish Button
+      document.getElementById('btn-publish-gallery')?.addEventListener('click', () => {
+        if (!currentKey) {
+          openModal('auth-gate-modal');
+          return;
+        }
+
+        const expiryDays = document.getElementById('select-expiry-days')?.value || 30;
+
+        try {
+          // Register with Auth Engine & save theme/layout config
+          const meta = AuthService.registerGallery(currentKey, currentFolderId, editor.config, expiryDays);
+          updatePreviewClientLink();
+          
+          // Generate Clean Short Client URL (pure domain + folder id)
+          const domainOrigin = window.location.protocol === 'file:' 
+            ? 'https://ceeze-studio.my.id' 
+            : window.location.origin;
+
+          const clientUrl = `${domainOrigin}/gallery.html?f=${currentFolderId}`;
+
+          document.getElementById('input-published-client-url').value = clientUrl;
+          document.getElementById('btn-open-published-tab').href = clientUrl;
+          
+          const expText = expiryDays > 0 ? `${expiryDays} Hari ke depan` : "Selamanya (Tanpa Batas)";
+          document.getElementById('published-expiry-info').innerHTML = `⏳ Masa aktif: <b>${expText}</b>. Kuota Anda telah terdaftar.`;
+
+          openModal('modal-publish-success');
+        } catch (err) {
+          showToast("⚠️ Gagal publish: " + err.message);
+        }
+      });
+
+      // Copy published URL
+      document.getElementById('btn-copy-published-url')?.addEventListener('click', () => {
+        const input = document.getElementById('input-published-client-url');
+        if (input) {
+          navigator.clipboard.writeText(input.value);
+          showToast("📋 Link Galeri Klien berhasil disalin!");
+        }
+      });
+    });
+
+    function updatePreviewClientLink() {
+      const btn = document.getElementById('btn-preview-client-link');
+      if (!btn) return;
+
+      // Save current unsaved theme/layout preview to metadata
+      const allMeta = AuthService.getAllGalleriesMeta();
+      allMeta[currentFolderId] = {
+        ...(allMeta[currentFolderId] || {}),
+        folderId: currentFolderId,
+        title: editor?.config?.heroTitle || "The Wedding Collection",
+        subtitle: editor?.config?.heroSubtitle || "A curated gallery of unforgettable moments and timeless memories.",
+        theme: editor?.config?.theme || "dark",
+        layout: editor?.config?.layout || "masonry",
+        columnsDesktop: editor?.config?.columnsDesktop || 3,
+        sortOrder: document.getElementById('select-sort-order')?.value || 'asc'
+      };
+      AuthService.saveAllGalleriesMeta(allMeta);
+
+      btn.href = `gallery.html?f=${currentFolderId}`;
+    }
+
+    function validateAndLoginKey(key) {
+      const res = AuthService.validateKey(key);
+      const errEl = document.getElementById('auth-error-msg');
+
+      if (!res.valid) {
+        if (errEl) {
+          errEl.textContent = res.reason;
+          errEl.style.display = 'block';
+        }
+        openModal('auth-gate-modal');
+        return;
+      }
+
+      currentKey = key.trim().toUpperCase();
+      localStorage.setItem('ceeze_active_key', currentKey);
+      closeModal('auth-gate-modal');
+
+      // Update badge
+      document.getElementById('client-name').textContent = `${res.license.clientName} (Sisa Kuota: ${res.remainingQuota} Galeri)`;
+      
+      // Initialize editor
+      editor.init(currentFolderId);
+      loadPhotos(currentFolderId);
+      showToast(`Selamat datang, ${res.license.clientName}!`);
+    }
+
+    let currentLoadedPhotos = [];
+
+    async function loadPhotos(folderId) {
+      const container = document.getElementById('gallery-container');
+      const badge = document.getElementById('display-photo-count');
+      
+      if (folderId === 'demo') {
+        currentLoadedPhotos = [...window.DEMO_PHOTOS];
+        applySortAndRender();
+        if (badge) badge.textContent = `${window.DEMO_PHOTOS.length} Foto (Sample Demo)`;
+        return;
+      }
+
+      container.innerHTML = `<div class="state-container"><div class="spinner"></div><p>Memuat foto Google Drive...</p></div>`;
+      try {
+        currentLoadedPhotos = await DriveService.fetchFolderPhotos(folderId);
+        applySortAndRender();
+        if (badge) badge.textContent = `${currentLoadedPhotos.length} Foto`;
+      } catch (err) {
+        console.error(err);
+        currentLoadedPhotos = [...window.DEMO_PHOTOS];
+        applySortAndRender();
+        showToast("Gagal memuat drive, menggunakan sample: " + err.message);
+      }
+    }
+
+    function applySortAndRender() {
+      const sortOrder = document.getElementById('select-sort-order')?.value || 'asc';
+      
+      currentLoadedPhotos.sort((a, b) => {
+        const nameA = a.name || "";
+        const nameB = b.name || "";
+        return sortOrder === 'asc'
+          ? nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' })
+          : nameB.localeCompare(nameA, undefined, { numeric: true, sensitivity: 'base' });
+      });
+
+      renderPhotos(currentLoadedPhotos);
+    }
+
+    function renderPhotos(photos) {
+      const container = document.getElementById('gallery-container');
+      if (!container) return;
+      container.innerHTML = "";
+
+      const isMobile = window.innerWidth <= 768 || document.getElementById('main-preview-area')?.classList.contains('mode-mobile-preview');
+      const numCols = isMobile ? (editor.config.columnsMobile || 1) : (editor.config.columnsDesktop || 3);
+
+      if (editor.config.layout === 'masonry' && numCols > 1) {
+        container.className = "gallery-container gallery-masonry-flow";
+        const tracks = [];
+        for (let c = 0; c < numCols; c++) {
+          const track = document.createElement('div');
+          track.className = "masonry-column-track";
+          container.appendChild(track);
+          tracks.push(track);
+        }
+
+        photos.forEach((photo, index) => {
+          const card = createEditorPhotoCard(photo);
+          tracks[index % numCols].appendChild(card);
+        });
+      } else {
+        container.className = "gallery-container gallery-grid";
+        if (editor.config.aspectRatio === "portrait") container.classList.add("aspect-portrait");
+        if (editor.config.aspectRatio === "landscape") container.classList.add("aspect-landscape");
+
+        photos.forEach(photo => {
+          const card = createEditorPhotoCard(photo);
+          container.appendChild(card);
+        });
+      }
+    }
+
+    function createEditorPhotoCard(photo) {
+      const card = document.createElement('div');
+      card.className = "photo-card";
+      card.innerHTML = `
+        <img src="${photo.previewUrl}" alt="${photo.name}" class="photo-img" loading="lazy" />
+        <div class="photo-overlay">
+          <div class="photo-bottom-info">
+            <p class="photo-name">${photo.name}</p>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+  </script>
+</body>
+</html>

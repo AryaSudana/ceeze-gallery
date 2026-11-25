@@ -3,6 +3,8 @@
  */
 
 const DriveService = {
+  // Google Drive API Key resmi CeEZe Studio
+  DEFAULT_API_KEY: "AIzaSyDcZ1A5wV7k7_PpXY-I3DUmUVGUJ5Z5HrM",
   STORAGE_KEY_API: "ceeze_gdrive_api_key",
   
   /**
@@ -36,7 +38,7 @@ const DriveService = {
    * Get configured Google Drive API Key
    */
   getApiKey() {
-    return localStorage.getItem(this.STORAGE_KEY_API) || "";
+    return localStorage.getItem(this.STORAGE_KEY_API) || this.DEFAULT_API_KEY || "";
   },
 
   /**
@@ -51,7 +53,7 @@ const DriveService = {
   },
 
   /**
-   * Fetch photos from a Google Drive Folder via official Drive API v3
+   * Fetch ALL photos from a Google Drive Folder via official Drive API v3 (No 100 limit, with pagination)
    */
   async fetchFolderPhotos(folderId, customApiKey = "") {
     const apiKey = customApiKey || this.getApiKey();
@@ -62,33 +64,52 @@ const DriveService = {
 
     // Query for non-trashed image files inside the specified parent folder
     const query = `'${folderId}' in parents and trashed = false and mimeType contains 'image/'`;
-    const fields = "files(id, name, mimeType, size, thumbnailLink, webContentLink, imageMediaMetadata)";
-    const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=${encodeURIComponent(fields)}&pageSize=100&orderBy=name&key=${apiKey}`;
-
-    const response = await fetch(url);
+    const fields = "nextPageToken,files(id, name, mimeType, size, thumbnailLink, webContentLink, imageMediaMetadata)";
     
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const message = errorData.error?.message || response.statusText;
+    let allFiles = [];
+    let pageToken = null;
+
+    // Loop through all pages to fetch all photos without being cut off at 100
+    do {
+      let url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=${encodeURIComponent(fields)}&pageSize=1000&orderBy=name&key=${apiKey}`;
+      if (pageToken) {
+        url += `&pageToken=${encodeURIComponent(pageToken)}`;
+      }
+
+      const response = await fetch(url);
       
-      if (response.status === 403 || response.status === 401) {
-        throw new Error("PERMISSION_OR_KEY_INVALID: " + message);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const message = errorData.error?.message || response.statusText;
+        
+        if (response.status === 403 || response.status === 401) {
+          throw new Error("PERMISSION_OR_KEY_INVALID: " + message);
+        }
+        if (response.status === 404) {
+          throw new Error("FOLDER_NOT_FOUND");
+        }
+        throw new Error(`GDRIVE_API_ERROR: ${message}`);
       }
-      if (response.status === 404) {
-        throw new Error("FOLDER_NOT_FOUND");
-      }
-      throw new Error(`GDRIVE_API_ERROR: ${message}`);
-    }
 
-    const data = await response.json();
-    const files = data.files || [];
+      const data = await response.json();
+      const files = data.files || [];
+      allFiles = allFiles.concat(files);
+      pageToken = data.nextPageToken || null;
+    } while (pageToken);
 
-    if (files.length === 0) {
+    if (allFiles.length === 0) {
       return [];
     }
 
+    // Natural Alphanumeric Sort (e.g. BEDUGUL-001 -> BEDUGUL-002 -> BEDUGUL-010)
+    allFiles.sort((a, b) => {
+      const nameA = a.name || "";
+      const nameB = b.name || "";
+      return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
+    });
+
     // Format files into clean photo objects
-    return files.map((file, index) => {
+    return allFiles.map((file, index) => {
       const width = file.imageMediaMetadata?.width || 1200;
       const height = file.imageMediaMetadata?.height || 800;
       const isPortrait = height > width;
@@ -96,7 +117,6 @@ const DriveService = {
       return {
         id: file.id,
         name: file.name || `Photo_${index + 1}.jpg`,
-        // Google Thumbnail CDN provides fast, optimized cached images
         previewUrl: `https://lh3.googleusercontent.com/d/${file.id}=w1200`,
         fullUrl: `https://lh3.googleusercontent.com/d/${file.id}=w2560`,
         downloadUrl: `https://drive.google.com/uc?export=download&id=${file.id}`,

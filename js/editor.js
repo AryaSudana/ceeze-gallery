@@ -75,24 +75,29 @@ class GalleryEditor {
   }
 
   loadSavedConfig() {
-    // 1. Try to load from URL hash if shared via link
-    const hash = window.location.hash;
-    if (hash && hash.startsWith("#cfg=")) {
-      try {
-        const decoded = JSON.parse(decodeURIComponent(atob(hash.replace("#cfg=", ""))));
-        this.config = { ...DEFAULT_CONFIG, ...decoded };
-        return;
-      } catch (e) {
-        console.warn("Failed to parse URL config:", e);
-      }
+    // 1. Check URL search parameters for short custom settings
+    const urlParams = new URLSearchParams(window.location.search);
+    const themeParam = urlParams.get('t') || urlParams.get('theme');
+    const layoutParam = urlParams.get('l') || urlParams.get('layout');
+    const titleParam = urlParams.get('title');
+
+    if (themeParam && THEME_PRESETS[themeParam]) {
+      this.config.theme = themeParam;
+      Object.assign(this.config, THEME_PRESETS[themeParam]);
+    }
+    if (layoutParam && (layoutParam === "masonry" || layoutParam === "grid")) {
+      this.config.layout = layoutParam;
+    }
+    if (titleParam) {
+      this.config.heroTitle = decodeURIComponent(titleParam);
     }
 
-    // 2. Try to load from localStorage
+    // 2. Try to load from localStorage if available
     const storageKey = this.folderId ? `ceeze_cfg_${this.folderId}` : "ceeze_cfg_default";
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
-        this.config = { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
+        this.config = { ...this.config, ...JSON.parse(saved) };
       } catch (e) {
         console.warn("Failed to parse local config:", e);
       }
@@ -103,10 +108,30 @@ class GalleryEditor {
     const storageKey = this.folderId ? `ceeze_cfg_${this.folderId}` : "ceeze_cfg_default";
     localStorage.setItem(storageKey, JSON.stringify(this.config));
     
-    // Also generate clean share link with hash
-    const encoded = btoa(encodeURIComponent(JSON.stringify(this.config)));
-    const shareUrl = `${window.location.origin}${window.location.pathname}?folder=${this.folderId || "demo"}#cfg=${encoded}`;
-    return shareUrl;
+    const baseUrl = `${window.location.origin}${window.location.pathname}`;
+    const folderParam = this.folderId || "demo";
+
+    // Build short parameters
+    const clientParams = new URLSearchParams();
+    clientParams.set("f", folderParam);
+
+    if (this.config.theme && this.config.theme !== "dark") {
+      clientParams.set("t", this.config.theme);
+    }
+    if (this.config.layout && this.config.layout !== "masonry") {
+      clientParams.set("l", this.config.layout);
+    }
+    if (this.config.heroTitle && this.config.heroTitle !== "The Wedding Collection") {
+      clientParams.set("title", this.config.heroTitle);
+    }
+
+    const editorParams = new URLSearchParams(clientParams);
+    editorParams.set("edit", "1");
+
+    return {
+      clientUrl: `${baseUrl}?${clientParams.toString()}`,
+      editorUrl: `${baseUrl}?${editorParams.toString()}`
+    };
   }
 
   bindInputs() {
@@ -144,6 +169,7 @@ class GalleryEditor {
           Object.assign(this.config, THEME_PRESETS[presetKey]);
           this.syncColorPickers();
           this.applyThemeColors();
+          this.applyTypography();
         }
       });
     });
@@ -256,40 +282,75 @@ class GalleryEditor {
     if (fontSelect) fontSelect.value = this.config.fontFamily;
   }
 
+  getStyleTarget() {
+    // If in editor page (sidebar exists), apply theme and typography ONLY
+    // to the preview viewport wrapper so the editor studio UI stays 100% fixed dark!
+    const isEditor = !!document.getElementById('editor-sidebar');
+    if (isEditor) {
+      const root = document.documentElement;
+      // Clean any lingering inline styles on root so editor UI stays default
+      root.style.removeProperty('--bg-color');
+      root.style.removeProperty('--text-primary');
+      root.style.removeProperty('--accent-color');
+      root.style.removeProperty('--font-family');
+      root.style.removeProperty('--font-heading');
+      root.style.removeProperty('--bg-secondary');
+      root.style.removeProperty('--border-color');
+      root.style.removeProperty('--card-bg');
+      root.style.removeProperty('--glass-bg');
+      root.style.removeProperty('--text-secondary');
+      root.style.removeProperty('--text-muted');
+
+      return document.getElementById('preview-viewport-wrapper') || document.getElementById('main-preview-area');
+    }
+    return document.documentElement;
+  }
+
   applyThemeColors() {
-    const root = document.documentElement;
-    root.style.setProperty('--bg-color', this.config.bgColor);
-    root.style.setProperty('--text-primary', this.config.textColor);
-    root.style.setProperty('--accent-color', this.config.accentColor);
+    const target = this.getStyleTarget();
+    if (!target) return;
+
+    target.style.setProperty('--bg-color', this.config.bgColor);
+    target.style.setProperty('--text-primary', this.config.textColor);
+    target.style.setProperty('--accent-color', this.config.accentColor);
 
     // Auto-calculate subtle borders & secondary surfaces based on background luminance
     const isDark = this.isColorDark(this.config.bgColor);
     if (isDark) {
-      root.style.setProperty('--bg-secondary', '#161920');
-      root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.1)');
-      root.style.setProperty('--card-bg', 'rgba(255, 255, 255, 0.04)');
-      root.style.setProperty('--glass-bg', 'rgba(13, 15, 18, 0.85)');
-      root.style.setProperty('--text-secondary', '#94a3b8');
-      root.style.setProperty('--text-muted', '#64748b');
+      target.style.setProperty('--bg-secondary', '#161920');
+      target.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.1)');
+      target.style.setProperty('--card-bg', 'rgba(255, 255, 255, 0.04)');
+      target.style.setProperty('--glass-bg', 'rgba(13, 15, 18, 0.85)');
+      target.style.setProperty('--text-secondary', '#94a3b8');
+      target.style.setProperty('--text-muted', '#64748b');
     } else {
-      root.style.setProperty('--bg-secondary', '#ffffff');
-      root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.08)');
-      root.style.setProperty('--card-bg', '#ffffff');
-      root.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.88)');
-      root.style.setProperty('--text-secondary', '#475569');
-      root.style.setProperty('--text-muted', '#94a3b8');
+      target.style.setProperty('--bg-secondary', '#ffffff');
+      target.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.08)');
+      target.style.setProperty('--card-bg', '#ffffff');
+      target.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.88)');
+      target.style.setProperty('--text-secondary', '#475569');
+      target.style.setProperty('--text-muted', '#94a3b8');
+    }
+
+    target.style.backgroundColor = this.config.bgColor;
+    target.style.color = this.config.textColor;
+
+    // In client view (gallery.html), also sync body background
+    if (target === document.documentElement && document.body) {
+      document.body.style.backgroundColor = this.config.bgColor;
+      document.body.style.color = this.config.textColor;
     }
   }
 
   applyLayout() {
-    const root = document.documentElement;
+    const target = this.getStyleTarget();
     const galleryEl = document.getElementById('gallery-container');
-    if (!galleryEl) return;
+    if (!target || !galleryEl) return;
 
-    root.style.setProperty('--columns-desktop', this.config.columnsDesktop);
-    root.style.setProperty('--columns-mobile', this.config.columnsMobile);
-    root.style.setProperty('--gallery-gap', `${this.config.gap}px`);
-    root.style.setProperty('--border-radius', `${this.config.borderRadius}px`);
+    target.style.setProperty('--columns-desktop', this.config.columnsDesktop);
+    target.style.setProperty('--columns-mobile', this.config.columnsMobile);
+    target.style.setProperty('--gallery-gap', `${this.config.gap}px`);
+    target.style.setProperty('--border-radius', `${this.config.borderRadius}px`);
 
     // Reset layout classes
     galleryEl.className = "gallery-container";
@@ -307,9 +368,27 @@ class GalleryEditor {
   }
 
   applyTypography() {
-    const root = document.documentElement;
-    root.style.setProperty('--font-family', this.config.fontFamily);
-    root.style.setProperty('--font-heading', this.config.fontHeading);
+    const target = this.getStyleTarget();
+    if (!target) return;
+
+    target.style.setProperty('--font-family', this.config.fontFamily);
+    target.style.setProperty('--font-heading', this.config.fontHeading);
+    target.style.fontFamily = this.config.fontFamily;
+
+    const titleEl = document.getElementById('display-hero-title');
+    if (titleEl) {
+      titleEl.style.fontFamily = this.config.fontHeading;
+      titleEl.style.color = this.config.textColor;
+    }
+    const subtitleEl = document.getElementById('display-hero-subtitle');
+    if (subtitleEl) {
+      subtitleEl.style.fontFamily = this.config.fontFamily;
+      subtitleEl.style.color = this.config.textColor;
+    }
+
+    if (target === document.documentElement && document.body) {
+      document.body.style.fontFamily = this.config.fontFamily;
+    }
   }
 
   applyAllStyles() {
@@ -317,6 +396,27 @@ class GalleryEditor {
     this.applyThemeColors();
     this.applyLayout();
     this.applyTypography();
+
+    // Sync slider positions and value displays
+    const colSlider = document.getElementById('input-columns-desktop');
+    const colValDisplay = document.getElementById('val-columns-desktop');
+    if (colSlider) colSlider.value = this.config.columnsDesktop;
+    if (colValDisplay) colValDisplay.textContent = this.config.columnsDesktop;
+
+    const colMobileSlider = document.getElementById('input-columns-mobile');
+    const colMobileValDisplay = document.getElementById('val-columns-mobile');
+    if (colMobileSlider) colMobileSlider.value = this.config.columnsMobile;
+    if (colMobileValDisplay) colMobileValDisplay.textContent = this.config.columnsMobile;
+
+    const gapSlider = document.getElementById('input-gallery-gap');
+    const gapValDisplay = document.getElementById('val-gallery-gap');
+    if (gapSlider) gapSlider.value = this.config.gap;
+    if (gapValDisplay) gapValDisplay.textContent = `${this.config.gap}px`;
+
+    const radiusSlider = document.getElementById('input-border-radius');
+    const radiusValDisplay = document.getElementById('val-border-radius');
+    if (radiusSlider) radiusSlider.value = this.config.borderRadius;
+    if (radiusValDisplay) radiusValDisplay.textContent = `${this.config.borderRadius}px`;
 
     // Populate initial text inputs
     const titleInput = document.getElementById('input-hero-title');

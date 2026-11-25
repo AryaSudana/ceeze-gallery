@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CeEZe Client Gallery</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    /* Clean client-specific styles */
+    .client-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 60px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .expired-banner {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .expired-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CLIENT TOP HEADER -->
+  <header class="client-header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="index.html" class="brand" title="CeEZe Studio">
+        <div class="brand-icon" style="font-size: 13px; font-weight: 800;">CZ</div>
+        <span class="brand-title">CeEZe Gallery</span>
+      </a>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <!-- Device Viewport Switcher (Desktop vs Mobile Mockup) -->
+      <div class="device-switcher-group hide-mobile">
+        <button type="button" id="btn-device-desktop" class="device-switch-btn active" title="Tampilan Layar Desktop / PC">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span>Desktop</span>
+        </button>
+        <button type="button" id="btn-device-mobile" class="device-switch-btn" title="Pratinjau Layar Smartphone (HP)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          <span>Mobile</span>
+        </button>
+      </div>
+
+      <!-- Expiry badge if applicable -->
+      <span id="expiry-badge" style="display: none; font-size: 11.5px; padding: 4px 10px; border-radius: 999px; background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-weight: 600;">
+        ⏳ Masa Aktif: <span id="expiry-days">0</span> hari lagi
+      </span>
+
+      <!-- Favorites Filter Button (Toggles between showing all photos and showing loved photos only) -->
+      <button id="btn-top-favorites" class="btn btn-secondary btn-sm" onclick="toggleFavoriteFilter();" title="Klik untuk memfilter: Tampilkan hanya foto pilihan">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <span id="fav-count-badge">0</span>
+        <span class="hide-mobile" id="fav-filter-text" style="font-size: 12px; margin-left: 2px;">Filter Pilihan</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN GALLERY WRAPPER -->
+  <main id="main-content" class="main-preview" style="min-height: calc(100vh - 60px);">
+    
+    <!-- EXPIRED VIEW (HIDDEN BY DEFAULT) -->
+    <div id="view-expired" class="expired-banner" style="display: none;">
+      <div class="expired-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 12px;">Masa Akses Galeri Berakhir</h2>
+      <p style="font-size: 15px; color: var(--text-secondary); max-width: 480px; line-height: 1.6; margin-bottom: 24px;">
+        Galeri foto ini telah melewati batas masa aktif yang ditentukan. Silakan hubungi CeEZe Studio atau fotografer kamu jika ingin memperpanjang akses tautan ini.
+      </p>
+      <a href="https://wa.me/?text=Halo%20CeEZe%20Studio,%20saya%20ingin%20meminta%20perpanjangan%20akses%20galeri%20foto%20saya" target="_blank" class="btn btn-primary" style="background: #25d366; border-color: #25d366;">
+        Hubungi via WhatsApp
+      </a>
+    </div>
+
+    <!-- ACTIVE GALLERY VIEW -->
+    <div id="view-active" class="preview-viewport-wrapper">
+      <div class="phone-notch"></div>
+      <div class="phone-home-bar"></div>
+      <div class="viewport-scroll-content">
+
+        <!-- HERO COVER -->
+        <section class="gallery-hero" id="gallery-hero-section">
+          <h1 class="gallery-title" id="display-hero-title">The Wedding Collection</h1>
+          <p class="gallery-subtitle" id="display-hero-subtitle">
+            A curated gallery of unforgettable moments and timeless memories.
+          </p>
+          <div class="gallery-meta-bar">
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Google Drive Synchronized
+            </span>
+            <span class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              Client Proofing Ready
+            </span>
+          </div>
+        </section>
+
+        <!-- GALLERY CONTROLS -->
+        <div class="gallery-controls-bar">
+          <span class="photo-count-badge" id="display-photo-count">Memuat foto...</span>
+
+          <button class="favorites-pill-btn" onclick="openWhatsAppModal();">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            Foto Pilihan
+          </button>
+        </div>
+
+        <!-- GALLERY PHOTOS CONTAINER -->
+        <div id="gallery-container" class="gallery-container gallery-masonry"></div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LIGHTBOX VIEWER -->
+  <div id="lightbox-modal" class="lightbox-modal">
+    <div class="lightbox-header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span id="lightbox-counter" style="font-size: 13px; color: #94a3b8; font-weight: 600;">1 / 1</span>
+        <span id="lightbox-title" class="lightbox-title">Photo</span>
+      </div>
+      <div class="lightbox-actions">
+        <button id="lightbox-favorite-btn" class="icon-action-btn" title="Tandai Favorit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </button>
+        <a id="lightbox-download-btn" href="#" class="icon-action-btn" title="Download Resolusi Penuh" target="_blank" download>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </a>
+        <button id="lightbox-close-btn" class="icon-action-btn" title="Tutup (Esc)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="lightbox-body">
+      <button id="lightbox-prev-btn" class="lightbox-nav-btn lightbox-prev">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <img id="lightbox-img" class="lightbox-img" src="" alt="Full view" />
+      <button id="lightbox-next-btn" class="lightbox-nav-btn lightbox-next">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- FLOATING WHATSAPP BUTTON -->
+  <button id="client-floating-badge" class="client-floating-badge" style="display: none;" onclick="openWhatsAppModal();">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/>
+    </svg>
+    <span id="floating-fav-count">0 Foto Terpilih</span>
+  </button>
+
+  <!-- MODAL: WHATSAPP & BATCH DOWNLOAD EXPORT -->
+  <div id="modal-whatsapp" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h3 class="modal-title">Daftar Foto Pilihan</h3>
+          <span id="modal-wa-count" style="font-size: 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 2px 8px; border-radius: 999px; font-weight: 700;">0 Foto</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-whatsapp');">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+          Kirim daftar foto yang kamu pilih langsung ke WhatsApp studio atau unduh semua foto pilihan sekaligus dalam file ZIP.
+        </p>
+        <div id="modal-wa-list" style="max-height: 180px; overflow-y: auto; margin-bottom: 16px; padding: 4px 8px; background: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color);"></div>
+
+        <!-- Download ZIP Option -->
+        <button id="btn-download-zip" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px; font-size: 13px;" onclick="downloadFavoritesAsZip();">
+          📥 Download Semua Foto Pilihan (.zip)
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-copy-fav-list" class="btn btn-secondary btn-sm">Salin Nomor Foto</button>
+        <button id="btn-send-whatsapp" class="btn btn-primary btn-sm" style="background-color: #25d366; border-color: #25d366;">
+          Kirim ke WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Notifikasi</div>
+
+  <!-- Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="js/demo-data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/drive.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/lightbox.js"></script>
+  <script src="js/favorites.js"></script>
+
+  <!-- Gallery Logic -->
+  <script>
+    let currentPhotos = [];
+    let lightbox = null;
+    let favorites = null;
+    let editor = null;
+    let isFilteringFavorites = false;
+
+    function showToast(msg, duration = 3000) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    }
+
+    function toggleFavoriteFilter() {
+      isFilteringFavorites = !isFilteringFavorites;
+      const btn = document.getElementById('btn-top-favorites');
+      const text = document.getElementById('fav-filter-text');
+
+      if (isFilteringFavorites) {
+        if (btn) btn.classList.add('btn-primary');
+        if (btn) btn.classList.remove('btn-secondary');
+        if (text) text.textContent = "Tampilkan Semua";
+        showToast("🔍 Menampilkan foto pilihan (favorit) saja");
+      } else {
+        if (btn) btn.classList.remove('btn-primary');
+        if (btn) btn.classList.add('btn-secondary');
+        if (text) text.textContent = "Filter Pilihan";
+        showToast("Tampilkan semua foto galeri");
+      }
+
+      renderGallery(currentPhotos);
+    }
+
+    function openWhatsAppModal() {
+      const list = favorites.getFavoritesList();
+      const countEl = document.getElementById('modal-wa-count');
+      const listContainer = document.getElementById('modal-wa-list');
+
+      if (countEl) countEl.textContent = `${list.length} Foto`;
+      if (listContainer) {
+        if (list.length === 0) {
+          listContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">Belum ada foto yang dipilih. Klik ikon hati pada foto untuk memilih.</p>`;
+        } else {
+          listContainer.innerHTML = list.map((p, i) => `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-color); font-size: 13px;">
+              <span>${i + 1}. ${p.name}</span>
+            </div>
+          `).join('');
+        }
+      }
+      openModal('modal-whatsapp');
+    }
+
+    // BATCH DOWNLOAD AS ZIP
+    async function downloadFavoritesAsZip() {
+      const list = favorites.getFavoritesList();
+      if (list.length === 0) {
+        showToast("⚠️ Belum ada foto yang dipilih untuk didownload");
+        return;
+      }
+
+      if (typeof JSZip === "undefined") {
+        showToast("Modul ZIP sedang dimuat, coba lagi sebentar...");
+        return;
+      }
+
+      const btn = document.getElementById('btn-download-zip');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+
+      try {
+        const zip = new JSZip();
+        const folder = zip.folder("Foto-Pilihan-CeEZe-Studio");
+
+        for (let i = 0; i < list.length; i++) {
+          const photo = list[i];
+          btn.textContent = `⏳ Mendownload (${i + 1}/${list.length}): ${photo.name.slice(0, 15)}...`;
+          showToast(`Mengambil foto ${i + 1} dari ${list.length}...`, 1500);
+
+          try {
+            // Fetch photo as blob
+            const response = await fetch(photo.fullUrl || photo.previewUrl);
+            const blob = await response.blob();
+            folder.file(photo.name || `Photo_${i + 1}.jpg`, blob);
+          } catch (e) {
+            console.warn("Gagal fetch foto:", photo.name, e);
+          }
+        }
+
+        btn.textContent = "📦 Mengompresi file ZIP...";
+        const content = await zip.generateAsync({ type: "blob" });
+        
+        // Trigger download
+        const downloadUrl = URL.createObjectURL(content);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `CeEZe-Studio-Foto-Pilihan.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(downloadUrl);
+
+        showToast("🎉 Berhasil mendownload semua foto pilihan (.zip)!");
+      } catch (err) {
+        console.error(err);
+        showToast("Gagal membuat zip: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const folderId = urlParams.get('f') || urlParams.get('folder') || 'demo';
+
+      // 1. Check Expiration & Metadata
+      const status = AuthService.checkGalleryStatus(folderId);
+      if (status.isExpired) {
+        document.getElementById('view-active').style.display = 'none';
+        document.getElementById('view-expired').style.display = 'flex';
+        return;
+      }
+
+      if (status.daysLeft !== null) {
+        const badge = document.getElementById('expiry-badge');
+        const daysEl = document.getElementById('expiry-days');
+        if (badge && daysEl) {
+          daysEl.textContent = status.daysLeft;
+          badge.style.display = 'inline-flex';
+        }
+      }
+
+      // 2. Load Gallery Metadata (Theme, Layout, Title)
+      const allMeta = AuthService.getAllGalleriesMeta();
+      const meta = allMeta[folderId] || {};
+
+      editor = new GalleryEditor();
+      editor.init(folderId);
+
+      // If registered metadata has custom theme/layout, apply it directly!
+      if (meta.theme) {
+        editor.config.theme = meta.theme;
+        if (THEME_PRESETS[meta.theme]) Object.assign(editor.config, THEME_PRESETS[meta.theme]);
+      }
+      if (meta.layout) editor.config.layout = meta.layout;
+      if (meta.title) editor.config.heroTitle = meta.title;
+      if (meta.subtitle) editor.config.heroSubtitle = meta.subtitle;
+      editor.applyAllStyles();
+
+      favorites = new FavoritesManager();
+      window.favoritesManager = favorites;
+      favorites.init(folderId);
+
+      lightbox = new GalleryLightbox();
+
+      // 3. Load Photos
+      if (folderId === 'demo') {
+        currentPhotos = [...window.DEMO_PHOTOS];
+        if (meta.sortOrder === 'desc') {
+          currentPhotos.reverse();
+        }
+        lightbox.setPhotos(currentPhotos);
+        renderGallery(currentPhotos);
+      } else {
+        const galleryEl = document.getElementById('gallery-container');
+        galleryEl.innerHTML = `<div class="state-container"><div class="spinner"></div><p>Memuat galeri foto...</p></div>`;
+        try {
+          currentPhotos = await DriveService.fetchFolderPhotos(folderId);
+          // Apply sort order from metadata
+          if (meta.sortOrder === 'desc') {
+            currentPhotos.sort((a, b) => (b.name || "").localeCompare(a.name || "", undefined, { numeric: true, sensitivity: 'base' }));
+          }
+          lightbox.setPhotos(currentPhotos);
+          renderGallery(currentPhotos);
+        } catch (err) {
+          console.error(err);
+          currentPhotos = [...window.DEMO_PHOTOS];
+          lightbox.setPhotos(currentPhotos);
+          renderGallery(currentPhotos);
+          showToast("Memuat galeri demo: " + err.message);
+        }
+      }
+
+      // Setup WhatsApp action
+      document.getElementById('btn-send-whatsapp')?.addEventListener('click', () => {
+        const waLink = favorites.generateWhatsAppLink();
+        if (waLink) {
+          window.open(waLink, '_blank');
+          closeModal('modal-whatsapp');
+        }
+      });
+
+      document.getElementById('btn-copy-fav-list')?.addEventListener('click', () => {
+        const list = favorites.getFavoritesList();
+        if (list.length === 0) return;
+        const text = list.map((p, i) => `${i + 1}. ${p.name}`).join('\n');
+        navigator.clipboard.writeText(text);
+        showToast("📋 Daftar foto berhasil disalin!");
+      });
+
+      // Device Viewport Switcher (Desktop vs Mobile Mockup)
+      const btnDeviceDesktop = document.getElementById('btn-device-desktop');
+      const btnDeviceMobile = document.getElementById('btn-device-mobile');
+      const mainContent = document.getElementById('main-content');
+
+      btnDeviceDesktop?.addEventListener('click', () => {
+        btnDeviceDesktop.classList.add('active');
+        btnDeviceMobile?.classList.remove('active');
+        mainContent?.classList.remove('mode-mobile-preview');
+        renderGallery(currentPhotos);
+        showToast("🖥️ Mode Tampilan Layar Desktop (PC)");
+      });
+
+      btnDeviceMobile?.addEventListener('click', () => {
+        btnDeviceMobile.classList.add('active');
+        btnDeviceDesktop?.classList.remove('active');
+        mainContent?.classList.add('mode-mobile-preview');
+        renderGallery(currentPhotos);
+        showToast("📱 Mode Pratinjau Mockup Smartphone (HP)");
+      });
+    });
+
+    function renderGallery(photos) {
+      const container = document.getElementById('gallery-container');
+      const countBadge = document.getElementById('display-photo-count');
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      // Check if filtering by favorites
+      const displayPhotos = isFilteringFavorites 
+        ? photos.filter(p => favorites.isFavorite(p.id))
+        : photos;
+
+      if (countBadge) {
+        countBadge.textContent = isFilteringFavorites 
+          ? `${displayPhotos.length} Foto Pilihan Ditampilkan` 
+          : `${photos.length} Foto`;
+      }
+
+      if (displayPhotos.length === 0) {
+        container.innerHTML = `
+          <div class="state-container" style="grid-column: 1 / -1; width: 100%;">
+            <p style="font-weight: 700; font-size: 16px;">Belum Ada Foto Pilihan</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 6px;">
+              ${isFilteringFavorites ? 'Klik ikon hati pada foto yang kamu sukai untuk melihatnya di sini.' : 'Folder ini tidak memiliki foto.'}
+            </p>
+            ${isFilteringFavorites ? '<button class="btn btn-secondary btn-sm" style="margin-top: 14px;" onclick="toggleFavoriteFilter();">Tampilkan Semua Foto</button>' : ''}
+          </div>
+        `;
+        return;
+      }
+
+      const isMobile = window.innerWidth <= 768 || document.getElementById('main-content')?.classList.contains('mode-mobile-preview');
+      const numCols = isMobile ? (editor.config.columnsMobile || 1) : (editor.config.columnsDesktop || 3);
+
+      if (editor.config.layout === 'masonry' && numCols > 1) {
+        container.className = "gallery-container gallery-masonry-flow";
+        const tracks = [];
+        for (let c = 0; c < numCols; c++) {
+          const track = document.createElement('div');
+          track.className = "masonry-column-track";
+          container.appendChild(track);
+          tracks.push(track);
+        }
+
+        displayPhotos.forEach((photo, index) => {
+          const card = createPhotoCardElement(photo, index);
+          tracks[index % numCols].appendChild(card);
+        });
+      } else {
+        container.className = "gallery-container gallery-grid";
+        if (editor.config.aspectRatio === "portrait") container.classList.add("aspect-portrait");
+        if (editor.config.aspectRatio === "landscape") container.classList.add("aspect-landscape");
+
+        displayPhotos.forEach((photo, index) => {
+          const card = createPhotoCardElement(photo, index);
+          container.appendChild(card);
+        });
+      }
+    }
+
+    function createPhotoCardElement(photo, index) {
+      const card = document.createElement('div');
+      card.className = "photo-card";
+      const isFav = favorites.isFavorite(photo.id);
+
+      card.innerHTML = `
+        <img src="${photo.previewUrl}" alt="${photo.name}" class="photo-img" loading="lazy" />
+        <div class="photo-overlay">
+          <div class="photo-top-actions">
+            <button class="icon-action-btn ${isFav ? 'favorite-active' : ''}" data-fav-id="${photo.id}" title="Pilih Favorit">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </button>
+            <a href="${photo.downloadUrl}" download="${photo.name}" class="icon-action-btn" title="Download" onclick="event.stopPropagation();">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </a>
+          </div>
+          <div class="photo-bottom-info">
+            <p class="photo-name">${photo.name}</p>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('[data-fav-id]')) {
+          e.stopPropagation();
+          favorites.toggleFavorite(photo);
+          if (isFilteringFavorites) {
+            renderGallery(currentPhotos);
+          }
+          return;
+        }
+        lightbox.open(index);
+      });
+
+      return card;
+    }
+  </script>
+</body>
+</html>
